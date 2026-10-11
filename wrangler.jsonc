@@ -1,0 +1,32 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "presurapi",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "presurapi",
+      // Identificador de ejemplo. El real se pone al desplegar (no es secreto, pero se gestiona desde CI).
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "LOGOS",
+      "bucket_name": "presurapi-logos"
+    }
+  ],
+  "vars": {
+    "APP_URL": "http://localhost:3000",
+    "EMAIL_FROM": "Presurapi <no-reply@example.com>"
+  },
+  "observability": { "enabled": true }
+  // Secretos (nunca aquí): RESEND_API_KEY. En local van en .dev.vars; en producción, con `wrangler secret put`.
+}

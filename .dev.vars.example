@@ -1,0 +1,3 @@
+# Copia este fichero a .dev.vars para desarrollo local (.dev.vars está en .gitignore).
+# NUNCA pongas aquí claves reales si vas a subirlo: este fichero es solo un ejemplo.
+# RESEND_API_KEY=re_xxxxxxxxxxxx

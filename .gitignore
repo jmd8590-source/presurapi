@@ -1,0 +1,44 @@
+# dependencias y compilación
+node_modules/
+.next/
+.open-next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# secretos y configuración local (NUNCA subir)
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+*.pem
+*.key
+*.p12
+secrets/
+
+# Cloudflare / Wrangler local
+.wrangler/
+
+# bases de datos locales y copias
+*.db
+*.sqlite
+*.sqlite3
+backups/
+
+# material de referencia ajeno (contiene datos de otra empresa)
+la-maquina-de-obras-main/
+
+# sistema y editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+npm-debug.log*
+.vercel/
+test-results/
+playwright-report/
