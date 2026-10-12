@@ -4,6 +4,7 @@ import { getSession } from "@/lib/session";
 import { Tools } from "@/components/Tools";
 import { T } from "@/components/T";
 import { getT } from "@/lib/i18n/server";
+import { IconBolt, IconFileText, IconLock } from "@/components/Icons";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT();
@@ -62,15 +63,18 @@ export default async function HomePage() {
         <section className="features">
           <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))" }}>
             <div className="card">
-              <h3 style={{ fontSize: "1.2rem" }}>⚡ <T k="landing.f1.title" /></h3>
+              <span className="feature-icon"><IconBolt /></span>
+              <h3 style={{ fontSize: "1.2rem" }}><T k="landing.f1.title" /></h3>
               <p className="muted"><T k="landing.f1.text" /></p>
             </div>
             <div className="card">
-              <h3 style={{ fontSize: "1.2rem" }}>📄 <T k="landing.f2.title" /></h3>
+              <span className="feature-icon"><IconFileText /></span>
+              <h3 style={{ fontSize: "1.2rem" }}><T k="landing.f2.title" /></h3>
               <p className="muted"><T k="landing.f2.text" /></p>
             </div>
             <div className="card">
-              <h3 style={{ fontSize: "1.2rem" }}>🔒 <T k="landing.f3.title" /></h3>
+              <span className="feature-icon"><IconLock /></span>
+              <h3 style={{ fontSize: "1.2rem" }}><T k="landing.f3.title" /></h3>
               <p className="muted"><T k="landing.f3.text" /></p>
             </div>
           </div>

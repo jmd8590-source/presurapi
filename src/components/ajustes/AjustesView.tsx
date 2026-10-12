@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import { updateEmpresaSettingsAction } from "@/app/acciones/empresa";
 import { cambiarPasswordAction, exportarDatosAction, eliminarCuentaAction } from "@/app/acciones/ajustes";
 import { useT } from "@/components/PrefsProvider";
-import { IconEye, IconEyeOff } from "@/components/Icons";
+import { IconEye, IconEyeOff, IconDownload } from "@/components/Icons";
 
 export function AjustesView({ empresa }: { empresa: any }) {
   const { t } = useT();
@@ -314,7 +314,7 @@ export function AjustesView({ empresa }: { empresa: any }) {
             disabled={exporting}
             aria-busy={exporting}
           >
-            {exporting ? t("common.loading") : t("settings.export")} 📥
+            <IconDownload /> {exporting ? t("common.loading") : t("settings.export")}
           </button>
         </div>
 

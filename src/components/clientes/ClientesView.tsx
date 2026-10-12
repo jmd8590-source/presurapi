@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { createClienteAction, updateClienteAction, deleteClienteAction } from "@/app/acciones/clientes";
 import { useT } from "@/components/PrefsProvider";
-import { IconPlus } from "@/components/Icons";
+import { IconPlus, IconPhone, IconMail } from "@/components/Icons";
 
 type ClienteItem = {
   id: string;
@@ -93,8 +93,8 @@ export function ClientesView({ clientes }: { clientes: ClienteItem[] }) {
               <div>
                 <h3 style={{ margin: 0, fontSize: "1.1rem" }}>{c.nombre}</h3>
                 <div className="row" style={{ gap: 12, marginTop: 4, fontSize: "0.85rem" }}>
-                  {c.telefono && <span className="muted">📞 {c.telefono}</span>}
-                  {c.email && <span className="muted">✉️ {c.email}</span>}
+                  {c.telefono && <span className="muted inline-icon"><IconPhone /> {c.telefono}</span>}
+                  {c.email && <span className="muted inline-icon"><IconMail /> {c.email}</span>}
                   <span className="badge badge-info">
                     {t("clients.worksCount", { n: c.obras })}
                   </span>

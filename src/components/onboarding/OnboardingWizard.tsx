@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { saveOnboardingAction } from "@/app/acciones/empresa";
 import { useT } from "@/components/PrefsProvider";
+import { IconCheck } from "@/components/Icons";
 
 export function OnboardingWizard({ initialData }: { initialData?: any }) {
   const { t } = useT();
@@ -228,7 +229,7 @@ export function OnboardingWizard({ initialData }: { initialData?: any }) {
             disabled={isPending}
             aria-busy={isPending}
           >
-            {isPending ? t("common.saving") : t("common.finish")} ✓
+            {isPending ? t("common.saving") : t("common.finish")} <IconCheck />
           </button>
         </div>
       </div>

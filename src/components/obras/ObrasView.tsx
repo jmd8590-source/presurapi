@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import { createObraAction, updateObraAction, deleteObraAction } from "@/app/acciones/obras";
 import { useT } from "@/components/PrefsProvider";
-import { IconPlus } from "@/components/Icons";
+import { IconPlus, IconUser, IconPin } from "@/components/Icons";
 
 type ObraItem = {
   id: string;
@@ -118,8 +118,8 @@ export function ObrasView({
                   {getStatusBadge(o.estado)}
                 </div>
                 <div className="row" style={{ gap: 12, marginTop: 6, fontSize: "0.85rem" }}>
-                  <span className="muted">👤 {o.clienteNombre}</span>
-                  {o.direccion && <span className="muted">📍 {o.direccion}</span>}
+                  <span className="muted inline-icon"><IconUser /> {o.clienteNombre}</span>
+                  {o.direccion && <span className="muted inline-icon"><IconPin /> {o.direccion}</span>}
                 </div>
               </div>
 

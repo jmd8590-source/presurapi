@@ -629,7 +629,7 @@ export async function resumen(empresaId: string) {
   // Presupuestos por estado
   const [pTotal] = await db.select({ n: sql<number>`count(*)` }).from(presupuesto).where(eq(presupuesto.empresaId, empresaId));
   const [pBorrador] = await db.select({ n: sql<number>`count(*)` }).from(presupuesto).where(and(eq(presupuesto.empresaId, empresaId), eq(presupuesto.estado, "borrador")));
-  const [pEnviado] = await db.select({ n: sql<number>`count(*)` }).from(presupuesto).where(and(eq(presupuesto.empresaId, empresaId), eq(presupuesto.estado, "en_viado" as any)));
+  const [pEnviado] = await db.select({ n: sql<number>`count(*)` }).from(presupuesto).where(and(eq(presupuesto.empresaId, empresaId), eq(presupuesto.estado, "enviado")));
   const [pAceptado] = await db.select({ n: sql<number>`count(*)` }).from(presupuesto).where(and(eq(presupuesto.empresaId, empresaId), eq(presupuesto.estado, "aceptado")));
 
   return {
@@ -665,6 +665,8 @@ export async function eliminarEmpresa(empresaId: string): Promise<string> {
   const db = getDb();
   const [emp] = await db.select({ logoKey: empresa.logoKey }).from(empresa).where(eq(empresa.id, empresaId)).limit(1);
   const usuarios = await db.select({ id: usuario.id }).from(usuario).where(eq(usuario.empresaId, empresaId));
+  await db.delete(schema.firma).where(eq(schema.firma.empresaId, empresaId));
+  await db.delete(schema.envioEmail).where(eq(schema.envioEmail.empresaId, empresaId));
   await db.delete(lineaPresupuesto).where(eq(lineaPresupuesto.empresaId, empresaId));
   await db.delete(opcionPresupuesto).where(eq(opcionPresupuesto.empresaId, empresaId));
   await db.delete(presupuesto).where(eq(presupuesto.empresaId, empresaId));
@@ -677,3 +679,168 @@ export async function eliminarEmpresa(empresaId: string): Promise<string> {
   return emp?.logoKey ?? "";
 }
 
+
+/* ------------------------------------------------ Fase 4: envío y firma */
+
+const { firma, envioEmail } = schema;
+
+export async function getEmpresa(empresaId: string) {
+  const [row] = await getDb().select().from(empresa).where(eq(empresa.id, empresaId)).limit(1);
+  return row ?? null;
+}
+
+export async function registrarEnvio(empresaId: string, presupuestoId: string, destinatario: string, asunto: string, ok: boolean) {
+  await getDb().insert(envioEmail).values({
+    id: crypto.randomUUID(),
+    empresaId,
+    presupuestoId,
+    destinatario,
+    asunto,
+    ok,
+    creadoEn: new Date(),
+  });
+}
+
+export async function listEnvios(empresaId: string, presupuestoId: string) {
+  return getDb()
+    .select()
+    .from(envioEmail)
+    .where(and(eq(envioEmail.empresaId, empresaId), eq(envioEmail.presupuestoId, presupuestoId)))
+    .orderBy(desc(envioEmail.creadoEn));
+}
+
+export async function listFirmas(empresaId: string, presupuestoId: string) {
+  return getDb()
+    .select({
+      id: firma.id,
+      accion: firma.accion,
+      opcionId: firma.opcionId,
+      opcionalesIds: firma.opcionalesIds,
+      nombre: firma.nombre,
+      comentario: firma.comentario,
+      creadoEn: firma.creadoEn,
+    })
+    .from(firma)
+    .where(and(eq(firma.empresaId, empresaId), eq(firma.presupuestoId, presupuestoId)))
+    .orderBy(desc(firma.creadoEn));
+}
+
+/** Pasa a "enviado" solo desde borrador (UPDATE condicionado). */
+export async function marcarEnviado(empresaId: string, presupuestoId: string) {
+  await getDb()
+    .update(presupuesto)
+    .set({ estado: "enviado", actualizadoEn: new Date() })
+    .where(and(eq(presupuesto.id, presupuestoId), eq(presupuesto.empresaId, empresaId), eq(presupuesto.estado, "borrador")));
+}
+
+/**
+ * Vista PÚBLICA del presupuesto por token. Nunca devuelve costes, márgenes ni notas internas.
+ * Un borrador no es visible para el cliente.
+ */
+export async function getPresupuestoPublico(tokenPublico: string) {
+  const completo = await getPresupuestoPorToken(tokenPublico);
+  if (!completo || completo.estado === "borrador") return null;
+  const emp = await getEmpresa(completo.empresaId);
+  if (!emp) return null;
+  const caduca = new Date(completo.fechaEmision).getTime() + completo.validezDias * 86_400_000;
+  return {
+    id: completo.id,
+    empresaId: completo.empresaId,
+    codigo: completo.codigo,
+    titulo: completo.titulo,
+    estado: completo.estado,
+    ivaPct: completo.ivaPct,
+    retencionPct: completo.retencionPct,
+    descuentoPct: completo.descuentoPct,
+    condiciones: completo.condiciones,
+    notasCliente: completo.notasCliente,
+    validezDias: completo.validezDias,
+    fechaEmision: completo.fechaEmision,
+    caducado: Date.now() > caduca,
+    cliente: { nombre: completo.cliente.nombre },
+    obra: completo.obra ? { nombre: completo.obra.nombre, direccion: completo.obra.direccion } : null,
+    empresa: {
+      nombre: emp.nombre,
+      cif: emp.cif,
+      telefono: emp.telefono,
+      emailContacto: emp.emailContacto,
+      direccion: emp.direccion,
+      cp: emp.cp,
+      poblacion: emp.poblacion,
+      provincia: emp.provincia,
+      piePdf: emp.piePdf,
+    },
+    opciones: completo.opciones.map((o) => ({
+      id: o.id,
+      nombre: o.nombre,
+      esSeleccionada: o.esSeleccionada,
+      lineas: o.lineas.map((l) => ({
+        id: l.id,
+        concepto: l.concepto,
+        descripcion: l.descripcion,
+        unidad: l.unidad,
+        cantidad: l.cantidad,
+        precioUnitario: l.precioUnitario,
+        esOpcional: l.esOpcional,
+      })),
+    })),
+  };
+}
+
+export type RespuestaCliente = {
+  accion: "aceptado" | "cambios";
+  opcionId: string;
+  opcionalesIds: string[];
+  nombre: string;
+  comentario: string;
+  firmaPng: string;
+  ipHash: string;
+  userAgent: string;
+};
+
+/** Registra la respuesta del cliente. Devuelve el motivo si no se pudo. */
+export async function registrarRespuestaCliente(
+  tokenPublico: string,
+  r: RespuestaCliente,
+): Promise<{ ok: true; empresaId: string; presupuestoId: string } | { ok: false; error: "no_encontrado" | "no_disponible" | "caducado" | "datos" }> {
+  const p = await getPresupuestoPublico(tokenPublico);
+  if (!p) return { ok: false, error: "no_encontrado" };
+  if (p.estado !== "enviado") return { ok: false, error: "no_disponible" };
+  if (p.caducado) return { ok: false, error: "caducado" };
+
+  const opcion = p.opciones.find((o) => o.id === r.opcionId);
+  if (r.accion === "aceptado") {
+    if (!opcion) return { ok: false, error: "datos" };
+    const validos = new Set(opcion.lineas.filter((l) => l.esOpcional).map((l) => l.id));
+    if (r.opcionalesIds.some((id) => !validos.has(id))) return { ok: false, error: "datos" };
+    if (!r.firmaPng.startsWith("data:image/png;base64,") || r.firmaPng.length > 300_000) return { ok: false, error: "datos" };
+  }
+
+  const db = getDb();
+  await db.insert(firma).values({
+    id: crypto.randomUUID(),
+    empresaId: p.empresaId,
+    presupuestoId: p.id,
+    accion: r.accion,
+    opcionId: r.opcionId,
+    opcionalesIds: JSON.stringify(r.opcionalesIds),
+    nombre: r.nombre,
+    comentario: r.comentario,
+    firmaPng: r.accion === "aceptado" ? r.firmaPng : "",
+    ipHash: r.ipHash,
+    userAgent: r.userAgent.slice(0, 300),
+    creadoEn: new Date(),
+  });
+
+  if (r.accion === "aceptado") {
+    await db
+      .update(opcionPresupuesto)
+      .set({ esSeleccionada: sql`(${opcionPresupuesto.id} = ${r.opcionId})` })
+      .where(and(eq(opcionPresupuesto.presupuestoId, p.id), eq(opcionPresupuesto.empresaId, p.empresaId)));
+    await db
+      .update(presupuesto)
+      .set({ estado: "aceptado", actualizadoEn: new Date() })
+      .where(and(eq(presupuesto.id, p.id), eq(presupuesto.empresaId, p.empresaId), eq(presupuesto.estado, "enviado")));
+  }
+  return { ok: true, empresaId: p.empresaId, presupuestoId: p.id };
+}

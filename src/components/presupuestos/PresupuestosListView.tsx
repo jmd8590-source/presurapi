@@ -8,8 +8,9 @@ import {
   eliminarPresupuestoAccion,
   cambiarEstadoPresupuestoAccion,
 } from "@/app/acciones/presupuestos";
+import { enviarPresupuestoAccion, enlacePresupuestoAccion } from "@/app/acciones/envio";
 import { formatearEuros } from "@/lib/calculo";
-import { IconPlus, IconFileText } from "@/components/Icons";
+import { IconPlus, IconUser, IconPin, IconSend, IconDownload, IconLink } from "@/components/Icons";
 import type { EstadoPresupuesto } from "@/db/schema";
 
 interface PresupuestoListItem {
@@ -36,6 +37,37 @@ export function PresupuestosListView({
   const [isPending, startTransition] = useTransition();
   const [filtroEstado, setFiltroEstado] = useState<string>("todos");
   const [busqueda, setBusqueda] = useState<string>("");
+  const [aviso, setAviso] = useState<{ ok: boolean; texto: string } | null>(null);
+
+  const enviar = (id: string) => {
+    setAviso(null);
+    startTransition(async () => {
+      const res = await enviarPresupuestoAccion(id);
+      if (res.ok) {
+        setAviso({ ok: true, texto: t("send.sent", { email: res.email }) });
+      } else {
+        const mapa = { no_encontrado: "send.err.notFound", sin_email: "send.err.noEmail", limite: "send.err.limit", fallo: "send.err.fail" } as const;
+        setAviso({ ok: false, texto: t(mapa[res.error]) });
+      }
+    });
+  };
+
+  const copiarEnlace = (id: string) => {
+    setAviso(null);
+    startTransition(async () => {
+      const res = await enlacePresupuestoAccion(id);
+      if (res.ok) {
+        try {
+          await navigator.clipboard.writeText(res.enlace);
+          setAviso({ ok: true, texto: t("send.linkCopied") });
+        } catch {
+          window.prompt(t("send.copyLink"), res.enlace);
+        }
+      } else {
+        setAviso({ ok: false, texto: t("send.err.notFound") });
+      }
+    });
+  };
 
   const duplicar = (id: string) => {
     startTransition(async () => {
@@ -98,6 +130,12 @@ export function PresupuestosListView({
           <span>{t("quotes.new")}</span>
         </Link>
       </div>
+
+      {aviso && (
+        <div className={`aviso ${aviso.ok ? "aviso-ok" : "aviso-error"} mb-6`} role="status" aria-live="polite">
+          {aviso.texto}
+        </div>
+      )}
 
       {/* Filtros */}
       <div className="card mb-6" style={{ padding: 16 }}>
@@ -169,8 +207,8 @@ export function PresupuestosListView({
                   </h3>
 
                   <div className="flex gap-4 text-sm muted flex-wrap mt-1">
-                    <span>👤 {p.clienteNombre}</span>
-                    {p.obraNombre && <span>📍 {p.obraNombre}</span>}
+                    <span className="inline-icon"><IconUser /> {p.clienteNombre}</span>
+                    {p.obraNombre && <span className="inline-icon"><IconPin /> {p.obraNombre}</span>}
                   </div>
                 </div>
 
@@ -182,7 +220,16 @@ export function PresupuestosListView({
                     </div>
                   </div>
 
-                  <div className="flex gap-2 items-center">
+                  <div className="flex gap-2 items-center flex-wrap">
+                    <button type="button" className="btn btn-primary" style={{ padding: "6px 12px", fontSize: "0.85rem" }} onClick={() => enviar(p.id)} disabled={isPending}>
+                      <IconSend /> <span>{t("send.email")}</span>
+                    </button>
+                    <a className="btn btn-outline" style={{ padding: "6px 12px", fontSize: "0.85rem" }} href={`/panel/presupuestos/${p.id}/pdf`} target="_blank" rel="noreferrer">
+                      <IconDownload /> <span>PDF</span>
+                    </a>
+                    <button type="button" className="btn btn-outline" style={{ padding: "6px 12px", fontSize: "0.85rem" }} onClick={() => copiarEnlace(p.id)} disabled={isPending}>
+                      <IconLink /> <span>{t("send.copyLink")}</span>
+                    </button>
                     <Link
                       href={`/panel/presupuestos/${p.id}`}
                       className="btn btn-outline"

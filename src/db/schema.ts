@@ -244,3 +244,49 @@ export const lineaPresupuesto = sqliteTable(
   ],
 );
 
+
+/** Respuesta del cliente final desde el enlace público: aceptación firmada o petición de cambios. */
+export const firma = sqliteTable(
+  "firma",
+  {
+    id: text("id").primaryKey(),
+    empresaId: text("empresa_id")
+      .notNull()
+      .references(() => empresa.id, { onDelete: "cascade" }),
+    presupuestoId: text("presupuesto_id")
+      .notNull()
+      .references(() => presupuesto.id, { onDelete: "cascade" }),
+    /** "aceptado" | "cambios" */
+    accion: text("accion").notNull(),
+    opcionId: text("opcion_id").notNull().default(""),
+    /** JSON con los ids de las líneas opcionales que el cliente ha marcado. */
+    opcionalesIds: text("opcionales_ids").notNull().default("[]"),
+    nombre: text("nombre").notNull().default(""),
+    comentario: text("comentario").notNull().default(""),
+    /** PNG de la firma en data URL (solo en aceptación). */
+    firmaPng: text("firma_png").notNull().default(""),
+    ipHash: text("ip_hash").notNull().default(""),
+    userAgent: text("user_agent").notNull().default(""),
+    creadoEn: ts("creado_en").notNull(),
+  },
+  (t) => [index("firma_presupuesto").on(t.presupuestoId, t.creadoEn), index("firma_empresa").on(t.empresaId)],
+);
+
+/** Registro de cada correo enviado al cliente final. */
+export const envioEmail = sqliteTable(
+  "envio_email",
+  {
+    id: text("id").primaryKey(),
+    empresaId: text("empresa_id")
+      .notNull()
+      .references(() => empresa.id, { onDelete: "cascade" }),
+    presupuestoId: text("presupuesto_id")
+      .notNull()
+      .references(() => presupuesto.id, { onDelete: "cascade" }),
+    destinatario: text("destinatario").notNull(),
+    asunto: text("asunto").notNull(),
+    ok: integer("ok", { mode: "boolean" }).notNull().default(false),
+    creadoEn: ts("creado_en").notNull(),
+  },
+  (t) => [index("envio_email_presupuesto").on(t.presupuestoId, t.creadoEn), index("envio_email_empresa").on(t.empresaId)],
+);

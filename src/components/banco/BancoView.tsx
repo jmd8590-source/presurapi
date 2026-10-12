@@ -9,7 +9,7 @@ import {
   precargarCatalogoBaseAccion,
 } from "@/app/acciones/banco";
 import { formatearEuros, eurosACentimos, centimosAEuros } from "@/lib/calculo";
-import { IconPlus, IconDatabase } from "@/components/Icons";
+import { IconPlus, IconDatabase, IconClose } from "@/components/Icons";
 
 interface CapituloItem {
   id: string;
@@ -348,7 +348,7 @@ export function BancoView({
                 style={{ background: "transparent", fontSize: "1.25rem" }}
                 onClick={() => setModalAbierto(false)}
               >
-                ✕
+                <IconClose />
               </button>
             </div>
 

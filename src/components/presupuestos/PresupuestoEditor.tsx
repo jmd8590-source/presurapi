@@ -15,7 +15,7 @@ import {
   centimosAEuros,
   calcularImporteLinea,
 } from "@/lib/calculo";
-import { IconPlus, IconDatabase } from "@/components/Icons";
+import { IconPlus, IconDatabase, IconLayers, IconLock, IconClose } from "@/components/Icons";
 
 interface ClienteSimple {
   id: string;
@@ -514,7 +514,7 @@ export function PresupuestoEditor({
                     className="btn btn-outline"
                     onClick={activarModoTresOpciones}
                   >
-                    ⭐ {t("editor.optionTriple")}
+                    <IconLayers /> {t("editor.optionTriple")}
                   </button>
                 )}
                 <button
@@ -670,7 +670,7 @@ export function PresupuestoEditor({
                             title={t("editor.deleteLine")}
                             onClick={() => eliminarLinea(lIdx)}
                           >
-                            ✕
+                            <IconClose />
                           </button>
                         </div>
 
@@ -897,7 +897,7 @@ export function PresupuestoEditor({
                   </div>
 
                   <p className="muted" style={{ margin: 0, fontSize: "0.75rem" }}>
-                    🔒 {t("editor.privateNote")}
+                    <span className="inline-icon"><IconLock /> {t("editor.privateNote")}</span>
                   </p>
                 </div>
 
@@ -1053,7 +1053,7 @@ export function PresupuestoEditor({
                 style={{ background: "transparent", fontSize: "1.25rem" }}
                 onClick={() => setModalBancoAbierto(false)}
               >
-                ✕
+                <IconClose />
               </button>
             </div>
 
