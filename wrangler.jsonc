@@ -27,6 +27,9 @@
     "APP_URL": "http://localhost:3000",
     "EMAIL_FROM": "Presurapi <no-reply@example.com>"
   },
+  "triggers": {
+    "crons": ["0 8 * * *"]
+  },
   "observability": { "enabled": true }
   // Secretos (nunca aquí): RESEND_API_KEY. En local van en .dev.vars; en producción, con `wrangler secret put`.
 }

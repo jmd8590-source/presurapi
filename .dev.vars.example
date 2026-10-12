@@ -1,3 +1,14 @@
 # Copia este fichero a .dev.vars para desarrollo local (.dev.vars está en .gitignore).
-# NUNCA pongas aquí claves reales si vas a subirlo: este fichero es solo un ejemplo.
+# NUNCA subas credenciales reales al repositorio.
+
+# Clave de API de Resend para envío real de correos (si no se define, se imprimen por consola en local)
 # RESEND_API_KEY=re_xxxxxxxxxxxx
+
+# Token secreto para proteger la invocación del Cron de seguimiento
+# CRON_SECRET=clave_secreta_para_cron_presurapi
+
+# URL pública de la aplicación (usada para los enlaces en los correos y portales)
+# APP_URL=http://localhost:3000
+
+# Remitente para correos salientes
+# EMAIL_FROM=Presurapi <no-reply@tudominio.es>
