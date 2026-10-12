@@ -10,7 +10,8 @@ import {
 } from "@/app/acciones/presupuestos";
 import { enviarPresupuestoAccion, enlacePresupuestoAccion } from "@/app/acciones/envio";
 import { formatearEuros } from "@/lib/calculo";
-import { IconPlus, IconUser, IconPin, IconSend, IconDownload, IconLink } from "@/components/Icons";
+import { IconPlus, IconUser, IconPin, IconSend } from "@/components/Icons";
+import { PresupuestoDropdown } from "./PresupuestoDropdown";
 import type { EstadoPresupuesto } from "@/db/schema";
 
 interface PresupuestoListItem {
@@ -220,48 +221,33 @@ export function PresupuestosListView({
                     </div>
                   </div>
 
-                  <div className="flex gap-2 items-center flex-wrap">
-                    <button type="button" className="btn btn-primary" style={{ padding: "6px 12px", fontSize: "0.85rem" }} onClick={() => enviar(p.id)} disabled={isPending}>
-                      <IconSend /> <span>{t("send.email")}</span>
+                  <div className="flex gap-2 items-center">
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      style={{ padding: "7px 14px", fontSize: "0.85rem" }}
+                      onClick={() => enviar(p.id)}
+                      disabled={isPending}
+                    >
+                      <IconSend />
+                      <span>{t("send.email")}</span>
                     </button>
-                    <a className="btn btn-outline" style={{ padding: "6px 12px", fontSize: "0.85rem" }} href={`/panel/presupuestos/${p.id}/pdf`} target="_blank" rel="noreferrer">
-                      <IconDownload /> <span>PDF</span>
-                    </a>
-                    <button type="button" className="btn btn-outline" style={{ padding: "6px 12px", fontSize: "0.85rem" }} onClick={() => copiarEnlace(p.id)} disabled={isPending}>
-                      <IconLink /> <span>{t("send.copyLink")}</span>
-                    </button>
+
                     <Link
                       href={`/panel/presupuestos/${p.id}`}
                       className="btn btn-outline"
-                      style={{ padding: "6px 12px", fontSize: "0.85rem" }}
+                      style={{ padding: "7px 14px", fontSize: "0.85rem" }}
                     >
                       {t("common.edit")}
                     </Link>
 
-                    <button
-                      type="button"
-                      className="btn btn-outline"
-                      style={{ padding: "6px 12px", fontSize: "0.85rem" }}
-                      onClick={() => duplicar(p.id)}
-                      disabled={isPending}
-                    >
-                      {t("quotes.duplicate")}
-                    </button>
-
-                    <button
-                      type="button"
-                      className="btn"
-                      style={{
-                        padding: "6px 12px",
-                        fontSize: "0.85rem",
-                        color: "var(--error)",
-                        background: "transparent",
-                      }}
-                      onClick={() => eliminar(p.id)}
-                      disabled={isPending}
-                    >
-                      {t("common.delete")}
-                    </button>
+                    <PresupuestoDropdown
+                      id={p.id}
+                      onCopiarEnlace={() => copiarEnlace(p.id)}
+                      onDuplicar={() => duplicar(p.id)}
+                      onEliminar={() => eliminar(p.id)}
+                      isPending={isPending}
+                    />
                   </div>
                 </div>
               </div>

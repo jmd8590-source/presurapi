@@ -96,3 +96,12 @@ export const IconPen = (p: SVGProps<SVGSVGElement>) => (
 export const IconLink = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base} {...p}><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1" /><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1" /></svg>
 );
+export const IconDots = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" /><circle cx="5" cy="12" r="1.5" /></svg>
+);
+export const IconCopy = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" /></svg>
+);
+export const IconTrash = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" /></svg>
+);

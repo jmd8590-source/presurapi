@@ -114,17 +114,19 @@ export function DashboardView({ data }: { data: DashboardData }) {
 
       {/* Tarjetas KPI */}
       <div className="grid grid-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-        <div className="card">
-          <div className="row" style={{ justifyContent: "space-between", marginBottom: 8 }}>
+        <div className="kpi-card">
+          <div className="row" style={{ justifyContent: "space-between", marginBottom: 12 }}>
             <span className="muted" style={{ fontWeight: 600, fontSize: "0.85rem" }}>
               {t("home.kpi.totalVolume")}
             </span>
-            <IconBolt />
+            <div className="kpi-icon-wrap">
+              <IconBolt />
+            </div>
           </div>
-          <p className="num" style={{ fontSize: "1.8rem", fontWeight: 800, margin: 0, color: "var(--accent)" }}>
+          <p className="num" style={{ fontSize: "1.9rem", fontWeight: 800, margin: 0, color: "var(--accent)" }}>
             {formatearEuros(data.totalAceptadoCents)}
           </p>
-          <div className="flex justify-between items-center mt-2">
+          <div className="flex justify-between items-center mt-3">
             <span className="muted" style={{ fontSize: "0.85rem" }}>
               {t("home.kpi.accepted")}: <strong className="num text-success">{data.presupuestosAceptado}</strong>
             </span>
@@ -134,55 +136,61 @@ export function DashboardView({ data }: { data: DashboardData }) {
           </div>
         </div>
 
-        <div className="card">
-          <div className="row" style={{ justifyContent: "space-between", marginBottom: 8 }}>
+        <div className="kpi-card">
+          <div className="row" style={{ justifyContent: "space-between", marginBottom: 12 }}>
             <span className="muted" style={{ fontWeight: 600, fontSize: "0.85rem" }}>
               {t("home.kpi.pending")}
             </span>
-            <IconSend />
+            <div className="kpi-icon-wrap info">
+              <IconSend />
+            </div>
           </div>
-          <p className="num" style={{ fontSize: "1.8rem", fontWeight: 800, margin: 0 }}>
+          <p className="num" style={{ fontSize: "1.9rem", fontWeight: 800, margin: 0 }}>
             {data.presupuestosEnviado}
           </p>
-          <div className="flex justify-between items-center mt-2">
+          <div className="flex justify-between items-center mt-3">
             <span className="muted" style={{ fontSize: "0.85rem" }}>
               Total en juego: <strong className="num">{formatearEuros(data.totalEnviadoCents)}</strong>
             </span>
           </div>
         </div>
 
-        <div className="card">
-          <div className="row" style={{ justifyContent: "space-between", marginBottom: 8 }}>
+        <div className="kpi-card">
+          <div className="row" style={{ justifyContent: "space-between", marginBottom: 12 }}>
             <span className="muted" style={{ fontWeight: 600, fontSize: "0.85rem" }}>
               {t("home.kpi.drafts")}
             </span>
-            <IconFileText />
+            <div className="kpi-icon-wrap">
+              <IconFileText />
+            </div>
           </div>
-          <p className="num" style={{ fontSize: "1.8rem", fontWeight: 800, margin: 0 }}>
+          <p className="num" style={{ fontSize: "1.9rem", fontWeight: 800, margin: 0 }}>
             {data.presupuestosBorrador}
           </p>
-          <div className="flex justify-between items-center mt-2">
-            <Link href="/panel/presupuestos" style={{ fontSize: "0.85rem" }}>
+          <div className="flex justify-between items-center mt-3">
+            <Link href="/panel/presupuestos" style={{ fontSize: "0.85rem", fontWeight: 600 }}>
               Ver todos ({data.presupuestosTotal}) →
             </Link>
           </div>
         </div>
 
-        <div className="card">
-          <div className="row" style={{ justifyContent: "space-between", marginBottom: 8 }}>
+        <div className="kpi-card">
+          <div className="row" style={{ justifyContent: "space-between", marginBottom: 12 }}>
             <span className="muted" style={{ fontWeight: 600, fontSize: "0.85rem" }}>
               {t("home.works")}
             </span>
-            <IconHammer />
+            <div className="kpi-icon-wrap ok">
+              <IconHammer />
+            </div>
           </div>
-          <p className="num" style={{ fontSize: "1.8rem", fontWeight: 800, margin: 0 }}>
+          <p className="num" style={{ fontSize: "1.9rem", fontWeight: 800, margin: 0 }}>
             {data.obrasEnCurso}
           </p>
-          <div className="flex justify-between items-center mt-2">
+          <div className="flex justify-between items-center mt-3">
             <span className="muted" style={{ fontSize: "0.85rem" }}>
               {t("home.clients")}: <strong className="num">{data.clientes}</strong>
             </span>
-            <Link href="/panel/obras" style={{ fontSize: "0.85rem" }}>
+            <Link href="/panel/obras" style={{ fontSize: "0.85rem", fontWeight: 600 }}>
               Ver obras →
             </Link>
           </div>

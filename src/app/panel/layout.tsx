@@ -28,7 +28,7 @@ export default async function PanelLayout({
       />
 
       <div className="app-shell">
-        <Topbar />
+        <Topbar usuario={session.usuario} empresa={session.empresa} />
         <main id="main-content" className="main">
           <div className="content">{children}</div>
         </main>
