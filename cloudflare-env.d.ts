@@ -7,6 +7,8 @@ interface __BaseEnv_CloudflareEnv {
 	ASSETS: Fetcher;
 	APP_URL: "http://localhost:3000";
 	EMAIL_FROM: "Presurapi <no-reply@example.com>";
+	CRON_SECRET?: string;
+	RESEND_API_KEY?: string;
 }
 declare namespace Cloudflare {
 	interface Env extends __BaseEnv_CloudflareEnv {}

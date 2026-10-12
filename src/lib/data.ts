@@ -617,6 +617,19 @@ export async function duplicarPresupuesto(empresaId: string, id: string): Promis
 
 /* --------------------------------------------------------------- resumen */
 
+export interface AlertaSeguimiento {
+  id: string;
+  presupuestoId: string;
+  codigo: string;
+  titulo: string;
+  clienteNombre: string;
+  clienteEmail: string;
+  tipo: "cambios" | "esperando" | "expira";
+  dias: number;
+  comentario?: string;
+  totalCents: number;
+}
+
 export async function resumen(empresaId: string) {
   const db = getDb();
   const [c] = await db.select({ n: sql<number>`count(*)` }).from(cliente).where(eq(cliente.empresaId, empresaId));
@@ -626,20 +639,114 @@ export async function resumen(empresaId: string) {
     .from(obra)
     .where(and(eq(obra.empresaId, empresaId), eq(obra.estado, "en_curso")));
 
-  // Presupuestos por estado
-  const [pTotal] = await db.select({ n: sql<number>`count(*)` }).from(presupuesto).where(eq(presupuesto.empresaId, empresaId));
-  const [pBorrador] = await db.select({ n: sql<number>`count(*)` }).from(presupuesto).where(and(eq(presupuesto.empresaId, empresaId), eq(presupuesto.estado, "borrador")));
-  const [pEnviado] = await db.select({ n: sql<number>`count(*)` }).from(presupuesto).where(and(eq(presupuesto.empresaId, empresaId), eq(presupuesto.estado, "enviado")));
-  const [pAceptado] = await db.select({ n: sql<number>`count(*)` }).from(presupuesto).where(and(eq(presupuesto.empresaId, empresaId), eq(presupuesto.estado, "aceptado")));
+  const todos = await listPresupuestos(empresaId);
+  const firmasEmpresa = await db
+    .select({
+      presupuestoId: firma.presupuestoId,
+      accion: firma.accion,
+      nombre: firma.nombre,
+      comentario: firma.comentario,
+      creadoEn: firma.creadoEn,
+    })
+    .from(firma)
+    .where(eq(firma.empresaId, empresaId))
+    .orderBy(desc(firma.creadoEn));
+
+  const firmasPorPresupuesto = new Map<string, typeof firmasEmpresa[0]>();
+  for (const f of firmasEmpresa) {
+    if (!firmasPorPresupuesto.has(f.presupuestoId)) {
+      firmasPorPresupuesto.set(f.presupuestoId, f);
+    }
+  }
+
+  let pBorrador = 0;
+  let pEnviado = 0;
+  let pAceptado = 0;
+  let pRechazado = 0;
+  let totalAceptadoCents = 0;
+  let totalEnviadoCents = 0;
+
+  const alertas: AlertaSeguimiento[] = [];
+  const ahora = Date.now();
+
+  for (const p of todos) {
+    if (p.estado === "borrador") pBorrador++;
+    else if (p.estado === "enviado") {
+      pEnviado++;
+      totalEnviadoCents += p.totalCents;
+
+      // Comprobar alertas
+      const ultimaFirma = firmasPorPresupuesto.get(p.id);
+      if (ultimaFirma?.accion === "cambios") {
+        alertas.push({
+          id: `cambios_${p.id}`,
+          presupuestoId: p.id,
+          codigo: p.codigo,
+          titulo: p.titulo,
+          clienteNombre: p.clienteNombre,
+          clienteEmail: "",
+          tipo: "cambios",
+          dias: Math.max(1, Math.floor((ahora - new Date(ultimaFirma.creadoEn).getTime()) / 86400000)),
+          comentario: ultimaFirma.comentario,
+          totalCents: p.totalCents,
+        });
+      } else {
+        const fechaEmisionMs = new Date(p.fechaEmision).getTime();
+        const diasEmitido = Math.floor((ahora - fechaEmisionMs) / 86400000);
+        const caducaMs = fechaEmisionMs + p.validezDias * 86400000;
+        const diasParaCaducar = Math.ceil((caducaMs - ahora) / 86400000);
+
+        if (diasParaCaducar > 0 && diasParaCaducar <= 7) {
+          alertas.push({
+            id: `expira_${p.id}`,
+            presupuestoId: p.id,
+            codigo: p.codigo,
+            titulo: p.titulo,
+            clienteNombre: p.clienteNombre,
+            clienteEmail: "",
+            tipo: "expira",
+            dias: diasParaCaducar,
+            totalCents: p.totalCents,
+          });
+        } else if (diasEmitido >= 3 && diasParaCaducar > 0) {
+          alertas.push({
+            id: `espera_${p.id}`,
+            presupuestoId: p.id,
+            codigo: p.codigo,
+            titulo: p.titulo,
+            clienteNombre: p.clienteNombre,
+            clienteEmail: "",
+            tipo: "esperando",
+            dias: diasEmitido,
+            totalCents: p.totalCents,
+          });
+        }
+      }
+    } else if (p.estado === "aceptado" || p.estado === "facturado") {
+      pAceptado++;
+      totalAceptadoCents += p.totalCents;
+    } else if (p.estado === "rechazado") {
+      pRechazado++;
+    }
+  }
+
+  const decididos = pAceptado + pRechazado;
+  const tasaConversion = decididos > 0 ? Math.round((pAceptado / decididos) * 100) : (todos.length > 0 ? Math.round((pAceptado / todos.length) * 100) : 0);
 
   return {
     clientes: c?.n ?? 0,
     obras: o?.n ?? 0,
     obrasEnCurso: a?.n ?? 0,
-    presupuestosTotal: pTotal?.n ?? 0,
-    presupuestosBorrador: pBorrador?.n ?? 0,
-    presupuestosEnviado: pEnviado?.n ?? 0,
-    presupuestosAceptado: pAceptado?.n ?? 0,
+    presupuestosTotal: todos.length,
+    presupuestosBorrador: pBorrador,
+    presupuestosEnviado: pEnviado,
+    presupuestosAceptado: pAceptado,
+    presupuestosRechazado: pRechazado,
+    totalAceptadoCents,
+    totalEnviadoCents,
+    tasaConversion,
+    recientes: todos.slice(0, 5),
+    alertas,
   };
 }
 

@@ -27,10 +27,10 @@ describe("Generación de PDF de presupuestos", () => {
         notasCliente: "Incluye desescombro y retirada a punto limpio.",
         cliente: {
           nombre: "Antonio Gómez",
+          nif: "12345678Z",
           email: "antonio@ejemplo.com",
           telefono: "611222333",
           direccion: "Av. Constitución 4",
-          poblacion: "Madrid",
         },
         obra: {
           nombre: "Piso Centro",
@@ -40,24 +40,23 @@ describe("Generación de PDF de presupuestos", () => {
           {
             id: "opc_1",
             nombre: "Estándar",
-            esSeleccionada: true,
             lineas: [
               {
-                id: "lin_1",
                 concepto: "Alicatado de paredes",
                 descripcion: "Azulejo porcelánico rectificado",
                 unidad: "m²",
                 cantidad: 25,
                 precioUnitario: 3500, // 35,00 €
+                costeUnitario: 0,
                 esOpcional: false,
               },
               {
-                id: "lin_2",
                 concepto: "Mampara de cristal templado",
                 descripcion: "Fijo + corredera antical",
                 unidad: "ud",
                 cantidad: 1,
                 precioUnitario: 42000, // 420,00 €
+                costeUnitario: 0,
                 esOpcional: true,
               },
             ],
