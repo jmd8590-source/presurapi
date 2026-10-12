@@ -118,3 +118,129 @@ export const obra = sqliteTable(
   },
   (t) => [index("obra_empresa").on(t.empresaId, t.creadoEn), index("obra_cliente").on(t.clienteId)],
 );
+
+export const capitulo = sqliteTable(
+  "capitulo",
+  {
+    id: text("id").primaryKey(),
+    empresaId: text("empresa_id"),
+    nombre: text("nombre").notNull(),
+    orden: integer("orden").notNull().default(0),
+    icono: text("icono").notNull().default(""),
+  },
+  (t) => [index("capitulo_empresa").on(t.empresaId, t.orden)],
+);
+
+export const partida = sqliteTable(
+  "partida",
+  {
+    id: text("id").primaryKey(),
+    empresaId: text("empresa_id")
+      .notNull()
+      .references(() => empresa.id, { onDelete: "cascade" }),
+    capituloId: text("capitulo_id")
+      .notNull()
+      .references(() => capitulo.id),
+    codigo: text("codigo").notNull().default(""),
+    concepto: text("concepto").notNull(),
+    descripcion: text("descripcion").notNull().default(""),
+    unidad: text("unidad").notNull().default("ud"),
+    /** En céntimos de euro */
+    precioVenta: integer("precio_venta").notNull().default(0),
+    /** En céntimos de euro (coste para el albañil: mano de obra + materiales) */
+    costeEstimado: integer("coste_estimado").notNull().default(0),
+    activo: integer("activo", { mode: "boolean" }).notNull().default(true),
+    creadoEn: ts("creado_en").notNull(),
+  },
+  (t) => [
+    index("partida_empresa").on(t.empresaId, t.concepto),
+    index("partida_capitulo").on(t.capituloId),
+  ],
+);
+
+export const ESTADOS_PRESUPUESTO = ["borrador", "enviado", "aceptado", "rechazado", "facturado"] as const;
+export type EstadoPresupuesto = (typeof ESTADOS_PRESUPUESTO)[number];
+
+export const presupuesto = sqliteTable(
+  "presupuesto",
+  {
+    id: text("id").primaryKey(),
+    empresaId: text("empresa_id")
+      .notNull()
+      .references(() => empresa.id, { onDelete: "cascade" }),
+    clienteId: text("cliente_id")
+      .notNull()
+      .references(() => cliente.id),
+    obraId: text("obra_id").references(() => obra.id),
+    codigo: text("codigo").notNull(),
+    titulo: text("titulo").notNull(),
+    estado: text("estado").notNull().default("borrador"),
+    ivaPct: real("iva_pct").notNull().default(21),
+    retencionPct: real("retencion_pct").notNull().default(0),
+    descuentoPct: real("descuento_pct").notNull().default(0),
+    condiciones: text("condiciones").notNull().default(""),
+    validezDias: integer("validez_dias").notNull().default(30),
+    fechaEmision: ts("fecha_emision").notNull(),
+    notasCliente: text("notas_cliente").notNull().default(""),
+    notasInternas: text("notas_internas").notNull().default(""),
+    tokenPublico: text("token_publico").notNull(),
+    creadoEn: ts("creado_en").notNull(),
+    actualizadoEn: ts("actualizado_en").notNull(),
+  },
+  (t) => [
+    index("presupuesto_empresa").on(t.empresaId, t.creadoEn),
+    index("presupuesto_cliente").on(t.clienteId),
+    uniqueIndex("presupuesto_token").on(t.tokenPublico),
+  ],
+);
+
+export const opcionPresupuesto = sqliteTable(
+  "opcion_presupuesto",
+  {
+    id: text("id").primaryKey(),
+    empresaId: text("empresa_id")
+      .notNull()
+      .references(() => empresa.id, { onDelete: "cascade" }),
+    presupuestoId: text("presupuesto_id")
+      .notNull()
+      .references(() => presupuesto.id, { onDelete: "cascade" }),
+    nombre: text("nombre").notNull(),
+    orden: integer("orden").notNull().default(0),
+    esSeleccionada: integer("es_seleccionada", { mode: "boolean" }).notNull().default(false),
+  },
+  (t) => [
+    index("opcion_presupuesto_empresa").on(t.empresaId),
+    index("opcion_presupuesto_id").on(t.presupuestoId),
+  ],
+);
+
+export const lineaPresupuesto = sqliteTable(
+  "linea_presupuesto",
+  {
+    id: text("id").primaryKey(),
+    empresaId: text("empresa_id")
+      .notNull()
+      .references(() => empresa.id, { onDelete: "cascade" }),
+    presupuestoId: text("presupuesto_id")
+      .notNull()
+      .references(() => presupuesto.id, { onDelete: "cascade" }),
+    opcionId: text("opcion_id").notNull(),
+    capituloId: text("capitulo_id").notNull().default(""),
+    codigoPartida: text("codigo_partida").notNull().default(""),
+    concepto: text("concepto").notNull(),
+    descripcion: text("descripcion").notNull().default(""),
+    unidad: text("unidad").notNull().default("ud"),
+    cantidad: real("cantidad").notNull().default(1),
+    /** En céntimos de euro */
+    precioUnitario: integer("precio_unitario").notNull().default(0),
+    /** En céntimos de euro */
+    costeUnitario: integer("coste_unitario").notNull().default(0),
+    esOpcional: integer("es_opcional", { mode: "boolean" }).notNull().default(false),
+    orden: integer("orden").notNull().default(0),
+  },
+  (t) => [
+    index("linea_presupuesto_empresa").on(t.empresaId),
+    index("linea_presupuesto_opcion").on(t.presupuestoId, t.opcionId, t.orden),
+  ],
+);
+

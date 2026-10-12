@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logoutAction } from "@/app/acciones/auth";
 import { useT } from "@/components/PrefsProvider";
-import { IconHome, IconUsers, IconHammer, IconSettings, IconLogout } from "@/components/Icons";
+import { IconHome, IconUsers, IconHammer, IconSettings, IconLogout, IconFileText, IconDatabase } from "@/components/Icons";
 
 export function Sidebar({ empresaNombre, usuarioNombre }: { empresaNombre: string; usuarioNombre: string }) {
   const { t } = useT();
@@ -12,8 +12,10 @@ export function Sidebar({ empresaNombre, usuarioNombre }: { empresaNombre: strin
 
   const links = [
     { href: "/panel", label: t("nav.home"), icon: <IconHome />, exact: true },
-    { href: "/panel/clientes", label: t("nav.clients"), icon: <IconUsers /> },
+    { href: "/panel/presupuestos", label: t("nav.quotes"), icon: <IconFileText /> },
     { href: "/panel/obras", label: t("nav.works"), icon: <IconHammer /> },
+    { href: "/panel/clientes", label: t("nav.clients"), icon: <IconUsers /> },
+    { href: "/panel/banco", label: t("nav.bank"), icon: <IconDatabase /> },
     { href: "/panel/ajustes", label: t("nav.settings"), icon: <IconSettings /> },
   ];
 

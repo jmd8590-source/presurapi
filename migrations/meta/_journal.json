@@ -8,6 +8,13 @@
       "when": 1791738299921,
       "tag": "0000_sloppy_lucky_pierre",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1791742201477,
+      "tag": "0001_even_wendigo",
+      "breakpoints": true
     }
   ]
 }

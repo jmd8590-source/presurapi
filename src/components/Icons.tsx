@@ -50,3 +50,10 @@ export const IconEye = (p: SVGProps<SVGSVGElement>) => (
 export const IconEyeOff = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base} {...p}><path d="M3 3l18 18" /><path d="M10.6 5.1A10 10 0 0112 5c6.4 0 10 7 10 7a17 17 0 01-3.2 4M6.1 6.2A17 17 0 002 12s3.6 7 10 7c1.6 0 3-.4 4.2-1" /><path d="M9.9 9.9a3 3 0 004.2 4.2" /></svg>
 );
+export const IconFileText = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><path d="M14 2v6h6" /><path d="M16 13H8" /><path d="M16 17H8" /><path d="M10 9H8" /></svg>
+);
+export const IconDatabase = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" /></svg>
+);
+

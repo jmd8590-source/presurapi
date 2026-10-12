@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useT } from "@/components/PrefsProvider";
-import { IconHome, IconUsers, IconHammer, IconSettings } from "@/components/Icons";
+import { IconHome, IconUsers, IconHammer, IconSettings, IconFileText } from "@/components/Icons";
 
 export function BottomNav() {
   const { t } = useT();
@@ -11,8 +11,9 @@ export function BottomNav() {
 
   const links = [
     { href: "/panel", label: t("nav.home"), icon: <IconHome />, exact: true },
-    { href: "/panel/clientes", label: t("nav.clients"), icon: <IconUsers /> },
+    { href: "/panel/presupuestos", label: t("nav.quotes"), icon: <IconFileText /> },
     { href: "/panel/obras", label: t("nav.works"), icon: <IconHammer /> },
+    { href: "/panel/clientes", label: t("nav.clients"), icon: <IconUsers /> },
     { href: "/panel/ajustes", label: t("nav.settings"), icon: <IconSettings /> },
   ];
 
