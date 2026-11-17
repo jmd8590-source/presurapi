@@ -1,12 +1,10 @@
-import StubPage from "@/components/ui/StubPage";
+import AuthShell from "@/components/auth/AuthShell";
+import RegisterForm from "@/components/auth/RegisterForm";
 
 export default function RegistroPage() {
   return (
-    <StubPage
-      titleEs="Regístrate"
-      titleEn="Sign up"
-      bodyEs="El registro llega en la Fase 3 (autenticación con Supabase)."
-      bodyEn="Sign-up arrives in Phase 3 (Supabase authentication)."
-    />
+    <AuthShell titleKey="auth.registerTitle">
+      <RegisterForm />
+    </AuthShell>
   );
 }

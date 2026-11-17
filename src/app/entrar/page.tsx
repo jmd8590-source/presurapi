@@ -1,12 +1,10 @@
-import StubPage from "@/components/ui/StubPage";
+import AuthShell from "@/components/auth/AuthShell";
+import LoginForm from "@/components/auth/LoginForm";
 
 export default function EntrarPage() {
   return (
-    <StubPage
-      titleEs="Entrar"
-      titleEn="Sign in"
-      bodyEs="El formulario de acceso llega en la Fase 3 (autenticación con Supabase)."
-      bodyEn="The sign-in form arrives in Phase 3 (Supabase authentication)."
-    />
+    <AuthShell titleKey="auth.loginTitle">
+      <LoginForm />
+    </AuthShell>
   );
 }
