@@ -1,49 +1,77 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
-import { PrefsProvider } from "@/components/PrefsProvider";
-import { CookieBanner } from "@/components/CookieBanner";
-import { getLang } from "@/lib/i18n/server";
+import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
+import { ThemeProvider } from "@/lib/theme/ThemeProvider";
+import { defaultLocale } from "@/lib/i18n";
+import SkipLink from "@/components/ui/SkipLink";
 
-// Las fuentes se descargan en la compilación y se sirven desde el propio dominio
-// (sin peticiones a Google desde el navegador del usuario, por RGPD).
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", display: "swap" });
+// Next.js 16 "Cache Components" prerenders this layout into the static shell, so it
+// never reads cookies()/headers() here (that would force the whole app dynamic).
+// The theme is instead corrected client-side, before first paint, by the inline
+// script below — see node_modules/next/dist/docs/01-app/02-guides/preventing-flash-before-hydration.md
+const THEME_INIT_SCRIPT = `(function(){try{var m=document.cookie.match(/(?:^|; )presurapi_theme=([^;]*)/);var t=m?decodeURIComponent(m[1]):null;if(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches){t="dark"}if(t==="dark"||t==="light"){document.documentElement.setAttribute("data-theme",t)}}catch(e){}})();`;
+
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  weight: ["500", "600", "700"],
+  display: "swap",
+});
+
+const plexSans = IBM_Plex_Sans({
+  variable: "--font-plex-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+});
+
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: { default: "Presurapi · Presupuestos y Seguimiento de Obras", template: "%s · Presurapi" },
-  description:
-    "Presupuestos y seguimiento de obras para albañiles y pequeñas empresas de reformas. Quotes and job tracking for builders.",
-  applicationName: "Presurapi",
-  robots: { index: true, follow: true },
+  title: "Presurapi",
+  description: "Presupuestos de obra en minutos para albañiles y reformas.",
 };
 
-// viewport-fit=cover permite usar las áreas seguras (notch, barra inferior).
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#FAF6EE" },
-    { media: "(prefers-color-scheme: dark)", color: "#1A1713" },
-  ],
 };
 
-// Aplica tema y accesibilidad antes de pintar para evitar parpadeos.
-const initScript = `(function(){try{var d=document.documentElement;var raw=localStorage.getItem('pr_prefs')||sessionStorage.getItem('pr_prefs');var p=raw?JSON.parse(raw):{};var t=p.theme||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');d.setAttribute('data-theme',t);if(p.scale)d.style.setProperty('--text-scale',p.scale);if(p.contrast)d.setAttribute('data-contrast','high');if(p.motion)d.setAttribute('data-motion','reduce');}catch(e){}})();`;
-
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const lang = await getLang();
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={lang} className={`${inter.variable} ${fraunces.variable}`} suppressHydrationWarning>
+    <html
+      lang={defaultLocale}
+      suppressHydrationWarning
+      className={`${fraunces.variable} ${plexSans.variable} ${plexMono.variable} h-full`}
+    >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: initScript }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
-      <body>
-        <PrefsProvider initialLang={lang}>
-          {children}
-          <CookieBanner />
-        </PrefsProvider>
+      <body className="flex min-h-dvh flex-col bg-(--color-paper) text-(--color-ink)">
+        <LocaleProvider>
+          <ThemeProvider>
+            <SkipLink />
+            <div
+              className="flex min-h-dvh flex-1 flex-col"
+              style={{
+                paddingTop: "env(safe-area-inset-top)",
+                paddingBottom: "env(safe-area-inset-bottom)",
+                paddingLeft: "env(safe-area-inset-left)",
+                paddingRight: "env(safe-area-inset-right)",
+              }}
+            >
+              {children}
+            </div>
+          </ThemeProvider>
+        </LocaleProvider>
       </body>
     </html>
   );
