@@ -5,6 +5,7 @@ import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { ThemeProvider } from "@/lib/theme/ThemeProvider";
 import { defaultLocale } from "@/lib/i18n";
 import SkipLink from "@/components/ui/SkipLink";
+import CookieBanner from "@/components/ui/CookieBanner";
 
 // Next.js 16 "Cache Components" prerenders this layout into the static shell, so it
 // never reads cookies()/headers() here (that would force the whole app dynamic).
@@ -70,6 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             >
               {children}
             </div>
+            <CookieBanner />
           </ThemeProvider>
         </LocaleProvider>
       </body>

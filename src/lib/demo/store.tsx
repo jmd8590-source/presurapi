@@ -113,6 +113,7 @@ type DemoStoreValue = {
   eliminarPartida: (id: string) => void;
   fijarPrecioMaterial: (materialNombre: string, precio: number) => void;
   quitarPrecioMaterial: (materialNombre: string) => void;
+  borrarTodosLosDatos: () => void;
 };
 
 const DemoStoreContext = createContext<DemoStoreValue | null>(null);
@@ -402,6 +403,13 @@ export function DemoDataProvider({
     [set],
   );
 
+  const borrarTodosLosDatos = useCallback<DemoStoreValue["borrarTodosLosDatos"]>(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(STORAGE_KEY);
+    }
+    setDb(dbVacia(email));
+  }, [email]);
+
   const value = useMemo<DemoStoreValue>(
     () => ({
       db,
@@ -423,6 +431,7 @@ export function DemoDataProvider({
       eliminarPartida,
       fijarPrecioMaterial,
       quitarPrecioMaterial,
+      borrarTodosLosDatos,
     }),
     [
       db,
@@ -444,6 +453,7 @@ export function DemoDataProvider({
       eliminarPartida,
       fijarPrecioMaterial,
       quitarPrecioMaterial,
+      borrarTodosLosDatos,
     ],
   );
 

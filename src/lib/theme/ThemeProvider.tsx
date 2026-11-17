@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { tienePermisoDePreferencias } from "@/lib/cookies/consent";
 
 export type Theme = "light" | "dark";
 const THEME_COOKIE = "presurapi_theme";
@@ -39,7 +40,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const applyTheme = useCallback((next: Theme) => {
     if (typeof document === "undefined") return;
     document.documentElement.setAttribute("data-theme", next);
-    document.cookie = `${THEME_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
+    // Solo se persiste en cookie con consentimiento de cookies de
+    // preferencia; sin él, el tema sigue funcionando pero no sobrevive a un
+    // cierre de pestaña (ver src/lib/cookies/consent.ts).
+    if (tienePermisoDePreferencias()) {
+      document.cookie = `${THEME_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
+    }
   }, []);
 
   const setTheme = useCallback(

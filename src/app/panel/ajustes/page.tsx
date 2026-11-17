@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { useDemoStore } from "@/lib/demo/store";
 import { PRECIO_HORA_OFICIAL_DEFECTO, PRECIO_HORA_PEON_DEFECTO } from "@/lib/demo/calculo";
+import { cerrarSesionDemo } from "@/app/acciones/demo-auth";
 
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -19,12 +20,30 @@ const inputClase =
 
 export default function AjustesPage() {
   const { t } = useLocale();
-  const { db, listo, actualizarPerfil } = useDemoStore();
+  const { db, listo, actualizarPerfil, borrarTodosLosDatos } = useDemoStore();
   const fileRef = useRef<HTMLInputElement>(null);
   const [guardado, setGuardado] = useState(false);
 
   if (!listo) return null;
   const { perfil } = db;
+
+  function onExportar() {
+    const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const enlace = document.createElement("a");
+    enlace.href = url;
+    enlace.download = "presurapi-mis-datos.json";
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function onBorrarCuenta() {
+    if (!window.confirm(t("ajustes.deleteAccountConfirm"))) return;
+    borrarTodosLosDatos();
+    await cerrarSesionDemo();
+  }
 
   function marcarGuardado() {
     setGuardado(true);
@@ -224,6 +243,28 @@ export default function AjustesPage() {
               onBlur={marcarGuardado}
             />
           </Campo>
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-sm font-semibold tracking-wide text-(--color-ink-muted) uppercase">
+          {t("ajustes.dataSection")}
+        </h2>
+        <div className="mt-3 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={onExportar}
+            className="rounded-sm border border-(--color-border-strong) px-4 py-2.5 text-sm font-medium text-(--color-ink) hover:border-(--color-brass)"
+          >
+            {t("ajustes.exportData")}
+          </button>
+          <button
+            type="button"
+            onClick={onBorrarCuenta}
+            className="rounded-sm border border-(--color-danger) px-4 py-2.5 text-sm font-medium text-(--color-danger)"
+          >
+            {t("ajustes.deleteAccount")}
+          </button>
         </div>
       </section>
     </div>

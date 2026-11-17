@@ -55,6 +55,19 @@ const es = {
     forgotBody:
       "La recuperación real de contraseña necesita Supabase Auth enviando un email de verdad; llega cuando exista el proyecto Supabase.",
   },
+  cookiesBanner: {
+    message:
+      "Usamos cookies necesarias para que la app funcione (sesión, tema e idioma). No usamos cookies de analítica ni de publicidad.",
+    acceptAll: "Aceptar todas",
+    reject: "Rechazar",
+    configure: "Configurar",
+    save: "Guardar preferencias",
+    necessary: "Necesarias",
+    necessaryDesc: "Imprescindibles para iniciar sesión y recordar tu elección de cookies. Siempre activas.",
+    preferences: "Preferencias",
+    preferencesDesc: "Recuerdan el idioma y el modo claro/oscuro entre visitas.",
+    policyLink: "Política de cookies",
+  },
   panel: {
     demoBanner:
       "Estás en modo demostración. Los datos se guardan solo en este navegador y desaparecen si lo borras.",
@@ -67,6 +80,24 @@ const es = {
       ajustes: "Ajustes",
     },
     logout: "Cerrar sesión",
+    tour: "Tour",
+    tourTitle: "Visita guiada",
+    tourNext: "Siguiente",
+    tourBack: "Atrás",
+    tourClose: "Cerrar",
+    tourFinish: "Terminar",
+    tourStep1Title: "Resumen",
+    tourStep1Body: "Tu panel de control: de un vistazo ves cuántos clientes, obras y presupuestos tienes.",
+    tourStep2Title: "Clientes",
+    tourStep2Body: "La ficha de cada cliente: nombre, NIF, contacto y notas. Se crean antes de dar de alta una obra.",
+    tourStep3Title: "Obras",
+    tourStep3Body: "Cada obra pertenece a un cliente. Los presupuestos siempre se crean dentro de una obra.",
+    tourStep4Title: "Presupuestos",
+    tourStep4Body: "Aquí está el asistente: creas capítulos, eliges el trabajo (tabique, solado, alicatado...), metes la medición y se calcula solo. Al final puedes descargar el PDF.",
+    tourStep5Title: "Banco de precios",
+    tourStep5Body: "Precios orientativos de materiales, con su fuente y fecha. Puedes fijar tu propio precio para cualquiera: tendrá prioridad.",
+    tourStep6Title: "Ajustes",
+    tourStep6Body: "Los datos de tu empresa (para el PDF), tus tarifas de oficial y peón, y los porcentajes de gastos generales, beneficio industrial e IVA.",
   },
   ajustes: {
     saved: "Guardado",
@@ -86,6 +117,11 @@ const es = {
     profitPct: "Beneficio industrial (%)",
     vatPct: "IVA (%)",
     defaultRatePrefix: "Por defecto si lo dejas vacío:",
+    dataSection: "Tus datos",
+    exportData: "Exportar mis datos",
+    deleteAccount: "Borrar mi cuenta",
+    deleteAccountConfirm:
+      "Esto borra todos tus clientes, obras y presupuestos de este navegador de forma permanente. ¿Seguro?",
   },
   clientes: {
     title: "Clientes",

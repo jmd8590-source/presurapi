@@ -57,6 +57,19 @@ const en: typeof es = {
     forgotBody:
       "Real password recovery needs Supabase Auth sending a real email; it arrives once the Supabase project exists.",
   },
+  cookiesBanner: {
+    message:
+      "We use necessary cookies to make the app work (session, theme and language). We don't use analytics or advertising cookies.",
+    acceptAll: "Accept all",
+    reject: "Reject",
+    configure: "Configure",
+    save: "Save preferences",
+    necessary: "Necessary",
+    necessaryDesc: "Required to sign in and remember your cookie choice. Always active.",
+    preferences: "Preferences",
+    preferencesDesc: "Remember your language and light/dark mode between visits.",
+    policyLink: "Cookie policy",
+  },
   panel: {
     demoBanner:
       "You're in demo mode. Data is saved only in this browser and is lost if you clear it.",
@@ -69,6 +82,24 @@ const en: typeof es = {
       ajustes: "Settings",
     },
     logout: "Sign out",
+    tour: "Tour",
+    tourTitle: "Guided tour",
+    tourNext: "Next",
+    tourBack: "Back",
+    tourClose: "Close",
+    tourFinish: "Finish",
+    tourStep1Title: "Overview",
+    tourStep1Body: "Your dashboard: see at a glance how many clients, projects and quotes you have.",
+    tourStep2Title: "Clients",
+    tourStep2Body: "Each client's file: name, tax ID, contact details and notes. Create these before adding a project.",
+    tourStep3Title: "Projects",
+    tourStep3Body: "Every project belongs to a client. Quotes are always created inside a project.",
+    tourStep4Title: "Quotes",
+    tourStep4Body: "This is the assistant: create chapters, pick the job (partition wall, flooring, tiling...), enter the measurement and it calculates itself. You can download the PDF at the end.",
+    tourStep5Title: "Price list",
+    tourStep5Body: "Guideline material prices, with their source and date. You can set your own price for any of them: it takes priority.",
+    tourStep6Title: "Settings",
+    tourStep6Body: "Your company details (for the PDF), your foreman and labourer rates, and the overhead, profit margin and VAT percentages.",
   },
   ajustes: {
     saved: "Saved",
@@ -88,6 +119,11 @@ const en: typeof es = {
     profitPct: "Profit margin (%)",
     vatPct: "VAT (%)",
     defaultRatePrefix: "Default if empty:",
+    dataSection: "Your data",
+    exportData: "Export my data",
+    deleteAccount: "Delete my account",
+    deleteAccountConfirm:
+      "This permanently deletes all your clients, projects and quotes from this browser. Are you sure?",
   },
   clientes: {
     title: "Clients",

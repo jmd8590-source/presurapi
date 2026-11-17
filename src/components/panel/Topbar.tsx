@@ -5,6 +5,7 @@ import { useLocale } from "@/lib/i18n/LocaleProvider";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import { cerrarSesionDemo } from "@/app/acciones/demo-auth";
+import GuidedTour from "@/components/panel/GuidedTour";
 
 export default function Topbar() {
   const { t } = useLocale();
@@ -15,6 +16,7 @@ export default function Topbar() {
         {t("common.appName")}
       </Link>
       <div className="flex items-center gap-2">
+        <GuidedTour />
         <LanguageToggle />
         <ThemeToggle />
         <form action={cerrarSesionDemo}>

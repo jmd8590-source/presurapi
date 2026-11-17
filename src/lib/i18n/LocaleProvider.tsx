@@ -11,6 +11,7 @@ import {
 } from "react";
 import { defaultLocale, dictionaries, isLocale, type Locale } from "./index";
 import { resolvePath, type TranslationKey } from "./paths";
+import { tienePermisoDePreferencias } from "@/lib/cookies/consent";
 
 const LOCALE_COOKIE = "presurapi_locale";
 
@@ -37,7 +38,11 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);
     if (typeof document !== "undefined") {
-      document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
+      // Igual que el tema: solo se persiste con consentimiento de cookies de
+      // preferencia (ver src/lib/cookies/consent.ts).
+      if (tienePermisoDePreferencias()) {
+        document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
+      }
       document.documentElement.lang = next;
     }
   }, []);
