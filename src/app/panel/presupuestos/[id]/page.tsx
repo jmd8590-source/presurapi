@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { useDemoStore } from "@/lib/demo/store";
 import { TRABAJOS } from "@/lib/demo/catalog";
+import { descargarPdf, generarPresupuestoPdf } from "@/lib/demo/pdf";
 import type { EstadoPresupuesto } from "@/lib/demo/types";
 
 const inputClase =
@@ -100,7 +101,7 @@ function NuevaPartida({ capituloId }: { capituloId: string }) {
 
 export default function PresupuestoPage() {
   const params = useParams<{ id: string }>();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const {
     db,
     listo,
@@ -138,6 +139,23 @@ export default function PresupuestoPage() {
     setNuevoCapitulo("");
   }
 
+  async function onDescargarPdf() {
+    if (!obra || !cliente) return;
+    const partidasDelPresupuesto = db.partidas.filter((p) =>
+      capitulos.some((c) => c.id === p.capitulo_id),
+    );
+    const bytes = await generarPresupuestoPdf({
+      presupuesto: presupuesto!,
+      obra,
+      cliente,
+      perfil: db.perfil,
+      capitulos,
+      partidas: partidasDelPresupuesto,
+      locale,
+    });
+    descargarPdf(bytes, `presupuesto-${presupuesto!.numero}.pdf`);
+  }
+
   return (
     <div className="mx-auto max-w-3xl">
       <Link href="/panel/presupuestos" className="text-sm text-(--color-brass) hover:underline">
@@ -151,19 +169,28 @@ export default function PresupuestoPage() {
           </h1>
           <p className="text-sm text-(--color-ink-muted)">{cliente?.nombre}</p>
         </div>
-        <select
-          className={inputClase}
-          value={presupuesto.estado}
-          onChange={(e) =>
-            cambiarEstadoPresupuesto(presupuesto.id, e.target.value as EstadoPresupuesto)
-          }
-        >
-          {(Object.keys(estadoLabelKey) as EstadoPresupuesto[]).map((estado) => (
-            <option key={estado} value={estado}>
-              {t(estadoLabelKey[estado])}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          <select
+            className={inputClase}
+            value={presupuesto.estado}
+            onChange={(e) =>
+              cambiarEstadoPresupuesto(presupuesto.id, e.target.value as EstadoPresupuesto)
+            }
+          >
+            {(Object.keys(estadoLabelKey) as EstadoPresupuesto[]).map((estado) => (
+              <option key={estado} value={estado}>
+                {t(estadoLabelKey[estado])}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={onDescargarPdf}
+            className="rounded-sm bg-(--color-brass) px-4 py-2.5 text-sm font-semibold text-(--color-brass-contrast) hover:bg-(--color-brass-hover)"
+          >
+            {t("presupuestos.downloadPdf")}
+          </button>
+        </div>
       </div>
 
       <section className="mt-8">
