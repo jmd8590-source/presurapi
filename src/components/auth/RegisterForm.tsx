@@ -3,26 +3,25 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
-import { registrarDemo, type EstadoAccionDemo } from "@/app/acciones/demo-auth";
+import { registrar, type EstadoAccion } from "@/app/acciones/auth";
 
-const estadoInicial: EstadoAccionDemo = { error: null };
+const estadoInicial: EstadoAccion = { error: null };
+
+const mensajeError = {
+  invalid: "auth.errorInvalid",
+  mismatch: "auth.errorPasswordMismatch",
+  exists: "auth.errorExists",
+} as const;
 
 export default function RegisterForm() {
   const { t } = useLocale();
-  const [estado, accion, enviando] = useActionState(registrarDemo, estadoInicial);
+  const [estado, accion, enviando] = useActionState(registrar, estadoInicial);
   const [password, setPassword] = useState("");
   const [confirmacion, setConfirmacion] = useState("");
   const noCoinciden = confirmacion.length > 0 && password !== confirmacion;
 
   return (
     <form action={accion} className="flex w-full max-w-sm flex-col gap-5">
-      <div
-        role="status"
-        className="rounded-sm border border-(--color-border-strong) bg-(--color-surface) px-4 py-3 text-xs leading-relaxed text-(--color-ink-muted)"
-      >
-        {t("auth.demoNotice")}
-      </div>
-
       <div className="flex flex-col gap-1.5">
         <label htmlFor="email" className="text-sm font-medium text-(--color-ink)">
           {t("auth.email")}
@@ -79,7 +78,7 @@ export default function RegisterForm() {
 
       {estado.error && (
         <p role="alert" className="text-sm text-(--color-danger)">
-          {t("auth.errorInvalid")}
+          {t(mensajeError[estado.error as keyof typeof mensajeError] ?? "auth.errorInvalid")}
         </p>
       )}
 

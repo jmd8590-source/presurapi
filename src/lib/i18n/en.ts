@@ -37,8 +37,6 @@ const en: typeof es = {
     cookies: "Cookies",
   },
   auth: {
-    demoNotice:
-      "Demo mode: any email and password will work. Nothing is verified or stored on any server; data lives only in this browser.",
     loginTitle: "Sign in",
     registerTitle: "Create your account",
     email: "Email",
@@ -53,9 +51,17 @@ const en: typeof es = {
     loginLink: "Sign in",
     errorInvalid: "Check your email and password.",
     errorPasswordMismatch: "Passwords don't match.",
+    errorExists: "There's already an account with that email. Try signing in instead.",
+    recoveredNotice: "Password updated. You can sign in with it now.",
     forgotTitle: "Reset password",
-    forgotBody:
-      "Real password recovery needs Appwrite Authentication sending a real email; it arrives once Appwrite is connected.",
+    forgotBody: "Enter your email and we'll send you a link to choose a new password.",
+    forgotSubmit: "Send link",
+    forgotSent:
+      "If that email has an account, we've sent a link to reset the password. Check your spam folder too.",
+    resetTitle: "Choose a new password",
+    resetSubmit: "Save password",
+    resetInvalidLink:
+      "This link is no longer valid or has expired. Request a new one from \"Forgot your password?\".",
   },
   cookiesBanner: {
     message:
@@ -71,8 +77,6 @@ const en: typeof es = {
     policyLink: "Cookie policy",
   },
   panel: {
-    demoBanner:
-      "You're in demo mode. Data is saved only in this browser and is lost if you clear it.",
     nav: {
       dashboard: "Overview",
       clientes: "Clients",
@@ -82,6 +86,9 @@ const en: typeof es = {
       ajustes: "Settings",
     },
     logout: "Sign out",
+    errorLoad: "We couldn't load your data. Check your connection and reload the page.",
+    errorSave: "That change couldn't be saved. Please try again.",
+    dismiss: "Dismiss notice",
     tour: "Tour",
     tourTitle: "Guided tour",
     tourNext: "Next",
@@ -123,7 +130,7 @@ const en: typeof es = {
     exportData: "Export my data",
     deleteAccount: "Delete my account",
     deleteAccountConfirm:
-      "This permanently deletes all your clients, projects and quotes from this browser. Are you sure?",
+      "This permanently and irreversibly deletes your account and all your clients, projects and quotes from our servers. Are you sure?",
   },
   clientes: {
     title: "Clients",

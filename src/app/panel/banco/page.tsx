@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
-import { useDemoStore } from "@/lib/demo/store";
+import { useAppwriteStore } from "@/lib/appwrite/store";
 import { MATERIALES } from "@/lib/demo/catalog";
 
 export default function BancoPreciosPage() {
   const { locale, t } = useLocale();
-  const { db, listo, fijarPrecioMaterial, quitarPrecioMaterial } = useDemoStore();
+  const { db, listo, fijarPrecioMaterial, quitarPrecioMaterial } = useAppwriteStore();
   const [edicion, setEdicion] = useState<Record<string, string>>({});
 
   if (!listo) return null;

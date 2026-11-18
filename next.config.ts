@@ -5,9 +5,13 @@ import type { NextConfig } from "next";
 // script/estilo/conexión no propios, que es el núcleo de la protección
 // frente a inyección. `'unsafe-inline'` en script-src cubre el único script
 // inline (corrección del tema antes del pintado, ver src/app/layout.tsx);
-// en style-src cubre los estilos de Tailwind. connect-src se ampliará con
-// el endpoint de Appwrite cuando se conecte (ver appwrite/DISENO.md).
+// en style-src cubre los estilos de Tailwind. connect-src incluye el
+// endpoint de Appwrite: el SDK llama a la API directamente desde el
+// navegador (TablesDB, Account), con permisos por documento aplicados en
+// servidor, así que no es una filtración ampliar este origen.
 const isDev = process.env.NODE_ENV === "development";
+const appwriteEndpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
+const appwriteOrigin = appwriteEndpoint ? new URL(appwriteEndpoint).origin : "";
 
 const csp = [
   "default-src 'self'",
@@ -17,7 +21,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
-  "connect-src 'self'",
+  `connect-src 'self'${appwriteOrigin ? ` ${appwriteOrigin}` : ""}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

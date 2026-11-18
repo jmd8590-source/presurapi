@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
-import { useDemoStore } from "@/lib/demo/store";
+import { useAppwriteStore } from "@/lib/appwrite/store";
 
 const inputClase =
   "rounded-sm border border-(--color-border-strong) bg-(--color-surface) px-3 py-2.5 text-sm text-(--color-ink) outline-none focus-visible:border-(--color-brass)";
 
 export default function ClientesPage() {
   const { t } = useLocale();
-  const { db, listo, crearCliente, cambiarEstadoCliente } = useDemoStore();
+  const { db, listo, crearCliente, cambiarEstadoCliente } = useAppwriteStore();
   const [abierto, setAbierto] = useState(false);
   const [form, setForm] = useState({
     nombre: "",

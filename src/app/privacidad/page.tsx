@@ -12,18 +12,17 @@ export default function PrivacidadPage() {
       updatedEn="Last updated: 17 November 2026"
       noticeEs={
         <>
-          Esta app está en <strong>modo demostración</strong>: el login no verifica contraseñas
-          reales y los datos (clientes, obras, presupuestos) se guardan solo en tu navegador,
-          no en ningún servidor. Los apartados sobre Appwrite y envío de email describen cómo
-          funcionará cuando se conecte el backend real.
+          Tu cuenta y tus datos (clientes, obras, presupuestos) se guardan de forma real en
+          Appwrite, con acceso restringido a tu propio usuario. El envío del presupuesto en PDF
+          por email (Resend) todavía no está activo: se activará cuando se configure un dominio
+          propio verificado.
         </>
       }
       noticeEn={
         <>
-          This app is in <strong>demo mode</strong>: sign-in does not verify real passwords and
-          data (clients, projects, quotes) is saved only in your browser, not on any server. The
-          sections about Appwrite and email sending describe how it will work once the real
-          backend is connected.
+          Your account and your data (clients, projects, quotes) are stored for real in
+          Appwrite, with access restricted to your own user. Emailing the PDF quote (Resend) is
+          not active yet: it will be enabled once a verified own domain is configured.
         </>
       }
       sectionsEs={[
@@ -83,8 +82,9 @@ export default function PrivacidadPage() {
           body: (
             <ul className="list-disc pl-5">
               <li>
-                Appwrite (base de datos, autenticación y almacenamiento): se usará cuando se
-                conecte el proyecto real; mientras tanto no se envía ningún dato a Appwrite.
+                Appwrite (base de datos y autenticación), con infraestructura en la Unión
+                Europea (Frankfurt): almacena tu cuenta y tus datos de clientes, obras y
+                presupuestos.
               </li>
               <li>
                 Resend (envío de emails con el PDF del presupuesto): se activará cuando el
@@ -99,8 +99,8 @@ export default function PrivacidadPage() {
           heading: "6. Plazo de conservación",
           body: (
             <p>
-              Mientras mantengas tu cuenta activa. En modo demostración, mientras no borres los
-              datos de tu navegador o uses la opción de borrar cuenta.
+              Mientras mantengas tu cuenta activa. Si usas la opción de borrar cuenta en
+              Ajustes, tus datos se eliminan de inmediato y de forma permanente.
             </p>
           ),
         },
@@ -123,9 +123,9 @@ export default function PrivacidadPage() {
           heading: "8. Seguridad",
           body: (
             <p>
-              El acceso a cada dato se restringe por usuario (permisos por documento a nivel de
-              base de datos cuando Appwrite esté conectado), las conexiones viajan cifradas
-              (HTTPS) y aplicamos cabeceras de seguridad conforme a buenas prácticas OWASP.
+              El acceso a cada dato se restringe por usuario mediante permisos por documento a
+              nivel de base de datos, las conexiones viajan cifradas (HTTPS) y aplicamos
+              cabeceras de seguridad conforme a buenas prácticas OWASP.
             </p>
           ),
         },
@@ -193,8 +193,8 @@ export default function PrivacidadPage() {
           body: (
             <ul className="list-disc pl-5">
               <li>
-                Appwrite (database, authentication and storage): will be used once the real
-                project is connected; no data is sent to Appwrite in the meantime.
+                Appwrite (database and authentication), hosted in the European Union
+                (Frankfurt): stores your account and your clients, projects and quotes data.
               </li>
               <li>
                 Resend (emailing the quote PDF): activated once the user configures their own
@@ -209,8 +209,8 @@ export default function PrivacidadPage() {
           heading: "6. Retention period",
           body: (
             <p>
-              For as long as your account remains active. In demo mode, until you clear your
-              browser data or use the delete-account option.
+              For as long as your account remains active. If you use the delete-account option
+              in Settings, your data is removed immediately and permanently.
             </p>
           ),
         },
@@ -232,9 +232,9 @@ export default function PrivacidadPage() {
           heading: "8. Security",
           body: (
             <p>
-              Access to each piece of data is restricted per user (database-level document
-              permissions once Appwrite is connected), connections are encrypted (HTTPS), and
-              we apply security headers following OWASP good practice.
+              Access to each piece of data is restricted per user through database-level
+              document permissions, connections are encrypted (HTTPS), and we apply security
+              headers following OWASP good practice.
             </p>
           ),
         },

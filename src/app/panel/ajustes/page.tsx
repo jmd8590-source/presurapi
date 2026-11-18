@@ -2,9 +2,9 @@
 
 import { useRef, useState } from "react";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
-import { useDemoStore } from "@/lib/demo/store";
+import { useAppwriteStore } from "@/lib/appwrite/store";
 import { PRECIO_HORA_OFICIAL_DEFECTO, PRECIO_HORA_PEON_DEFECTO } from "@/lib/demo/calculo";
-import { cerrarSesionDemo } from "@/app/acciones/demo-auth";
+import { borrarCuentaCompleta } from "@/app/acciones/auth";
 
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -20,9 +20,10 @@ const inputClase =
 
 export default function AjustesPage() {
   const { t } = useLocale();
-  const { db, listo, actualizarPerfil, borrarTodosLosDatos } = useDemoStore();
+  const { db, listo, actualizarPerfil } = useAppwriteStore();
   const fileRef = useRef<HTMLInputElement>(null);
   const [guardado, setGuardado] = useState(false);
+  const [borrando, setBorrando] = useState(false);
 
   if (!listo) return null;
   const { perfil } = db;
@@ -41,8 +42,8 @@ export default function AjustesPage() {
 
   async function onBorrarCuenta() {
     if (!window.confirm(t("ajustes.deleteAccountConfirm"))) return;
-    borrarTodosLosDatos();
-    await cerrarSesionDemo();
+    setBorrando(true);
+    await borrarCuentaCompleta();
   }
 
   function marcarGuardado() {
@@ -261,7 +262,8 @@ export default function AjustesPage() {
           <button
             type="button"
             onClick={onBorrarCuenta}
-            className="rounded-sm border border-(--color-danger) px-4 py-2.5 text-sm font-medium text-(--color-danger)"
+            disabled={borrando}
+            className="rounded-sm border border-(--color-danger) px-4 py-2.5 text-sm font-medium text-(--color-danger) disabled:opacity-60"
           >
             {t("ajustes.deleteAccount")}
           </button>

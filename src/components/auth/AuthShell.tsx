@@ -10,7 +10,7 @@ export default function AuthShell({
   titleKey,
   children,
 }: {
-  titleKey: "auth.loginTitle" | "auth.registerTitle" | "auth.forgotTitle";
+  titleKey: "auth.loginTitle" | "auth.registerTitle" | "auth.forgotTitle" | "auth.resetTitle";
   children: ReactNode;
 }) {
   const { t } = useLocale();

@@ -3,14 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
-import { useDemoStore } from "@/lib/demo/store";
+import { useAppwriteStore } from "@/lib/appwrite/store";
 
 const inputClase =
   "rounded-sm border border-(--color-border-strong) bg-(--color-surface) px-3 py-2.5 text-sm text-(--color-ink) outline-none focus-visible:border-(--color-brass)";
 
 export default function ObrasPage() {
   const { t } = useLocale();
-  const { db, listo, crearObra, cambiarEstadoObra } = useDemoStore();
+  const { db, listo, crearObra, cambiarEstadoObra } = useAppwriteStore();
   const [abierto, setAbierto] = useState(false);
   const [form, setForm] = useState({ cliente_id: "", nombre: "", direccion: "", descripcion: "" });
 

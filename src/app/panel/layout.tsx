@@ -1,26 +1,33 @@
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getDemoSessionEmail } from "@/lib/demo/session";
-import { DemoDataProvider } from "@/lib/demo/store";
+import { getLoggedInUser } from "@/lib/appwrite/server";
+import { SESSION_COOKIE } from "@/lib/appwrite/config";
+import { AppwriteDataProvider } from "@/lib/appwrite/store";
 import Topbar from "@/components/panel/Topbar";
 import Sidebar from "@/components/panel/Sidebar";
 import BottomNav from "@/components/panel/BottomNav";
-import DemoBanner from "@/components/panel/DemoBanner";
+import ErrorBanner from "@/components/panel/ErrorBanner";
 
-// Zona autenticada y totalmente dinámica (depende de la cookie de sesión de
-// demo en cada petición): no tiene sentido como shell estático, así que se
-// excluye de la validación de "instant navigation" de Cache Components.
+// Zona autenticada y totalmente dinámica (depende de la cookie de sesión en
+// cada petición): no tiene sentido como shell estático, así que se excluye
+// de la validación de "instant navigation" de Cache Components.
 export const instant = false;
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
-  const email = await getDemoSessionEmail();
-  if (!email) {
+  const usuario = await getLoggedInUser();
+  if (!usuario) {
     redirect("/entrar");
   }
 
+  // getLoggedInUser ya comprobó que la cookie es una sesión válida en
+  // Appwrite; se vuelve a leer aquí solo para pasar el secreto al cliente
+  // del navegador (ver AppwriteDataProvider).
+  const sessionSecret = (await cookies()).get(SESSION_COOKIE)!.value;
+
   return (
-    <DemoDataProvider email={email}>
+    <AppwriteDataProvider userId={usuario.$id} sessionSecret={sessionSecret} email={usuario.email}>
       <div className="flex min-h-dvh flex-1 flex-col">
-        <DemoBanner />
+        <ErrorBanner />
         <Topbar />
         <div className="flex flex-1">
           <Sidebar />
@@ -30,6 +37,6 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         </div>
         <BottomNav />
       </div>
-    </DemoDataProvider>
+    </AppwriteDataProvider>
   );
 }

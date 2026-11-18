@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
-import { useDemoStore } from "@/lib/demo/store";
+import { useAppwriteStore } from "@/lib/appwrite/store";
 
 const inputClase =
   "rounded-sm border border-(--color-border-strong) bg-(--color-surface) px-3 py-2.5 text-sm text-(--color-ink) outline-none focus-visible:border-(--color-brass)";
@@ -19,7 +19,7 @@ const estadoLabelKey = {
 export default function PresupuestosPage() {
   const { t } = useLocale();
   const router = useRouter();
-  const { db, listo, crearPresupuesto } = useDemoStore();
+  const { db, listo, crearPresupuesto } = useAppwriteStore();
   const [obraSeleccionada, setObraSeleccionada] = useState("");
 
   if (!listo) return null;

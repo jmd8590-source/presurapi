@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
-import { useDemoStore } from "@/lib/demo/store";
+import { useAppwriteStore } from "@/lib/appwrite/store";
 
 export default function PanelDashboard() {
   const { t } = useLocale();
-  const { db, listo } = useDemoStore();
+  const { db, listo } = useAppwriteStore();
 
   if (!listo) return null;
 

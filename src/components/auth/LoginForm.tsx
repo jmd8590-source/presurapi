@@ -2,23 +2,34 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
-import { iniciarSesionDemo, type EstadoAccionDemo } from "@/app/acciones/demo-auth";
+import { iniciarSesion, type EstadoAccion } from "@/app/acciones/auth";
 
-const estadoInicial: EstadoAccionDemo = { error: null };
+const estadoInicial: EstadoAccion = { error: null };
+
+const mensajeError = {
+  invalid: "auth.errorInvalid",
+  mismatch: "auth.errorPasswordMismatch",
+  exists: "auth.errorExists",
+} as const;
 
 export default function LoginForm() {
   const { t } = useLocale();
-  const [estado, accion, enviando] = useActionState(iniciarSesionDemo, estadoInicial);
+  const [estado, accion, enviando] = useActionState(iniciarSesion, estadoInicial);
+  const params = useSearchParams();
+  const recuperada = params.get("recuperada") === "1";
 
   return (
     <form action={accion} className="flex w-full max-w-sm flex-col gap-5">
-      <div
-        role="status"
-        className="rounded-sm border border-(--color-border-strong) bg-(--color-surface) px-4 py-3 text-xs leading-relaxed text-(--color-ink-muted)"
-      >
-        {t("auth.demoNotice")}
-      </div>
+      {recuperada && (
+        <p
+          role="status"
+          className="rounded-sm border border-(--color-success) bg-(--color-surface) px-4 py-3 text-sm text-(--color-success)"
+        >
+          {t("auth.recoveredNotice")}
+        </p>
+      )}
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="email" className="text-sm font-medium text-(--color-ink)">
@@ -50,7 +61,7 @@ export default function LoginForm() {
 
       {estado.error && (
         <p role="alert" className="text-sm text-(--color-danger)">
-          {t("auth.errorInvalid")}
+          {t(mensajeError[estado.error as keyof typeof mensajeError] ?? "auth.errorInvalid")}
         </p>
       )}
 

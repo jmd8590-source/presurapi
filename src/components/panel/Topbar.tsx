@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import LanguageToggle from "@/components/ui/LanguageToggle";
-import { cerrarSesionDemo } from "@/app/acciones/demo-auth";
+import { cerrarSesion } from "@/app/acciones/auth";
 import GuidedTour from "@/components/panel/GuidedTour";
 
 export default function Topbar() {
@@ -19,7 +19,7 @@ export default function Topbar() {
         <GuidedTour />
         <LanguageToggle />
         <ThemeToggle />
-        <form action={cerrarSesionDemo}>
+        <form action={cerrarSesion}>
           <button
             type="submit"
             className="rounded-sm border border-(--color-border-strong) px-3 py-2 text-sm font-medium text-(--color-ink) hover:border-(--color-brass)"

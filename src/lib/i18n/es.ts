@@ -35,8 +35,6 @@ const es = {
     cookies: "Cookies",
   },
   auth: {
-    demoNotice:
-      "Modo demostración: cualquier email y contraseña entran. No se verifica nada ni se guarda en ningún servidor; los datos viven solo en este navegador.",
     loginTitle: "Entrar",
     registerTitle: "Crea tu cuenta",
     email: "Email",
@@ -51,9 +49,17 @@ const es = {
     loginLink: "Entra",
     errorInvalid: "Revisa el email y la contraseña.",
     errorPasswordMismatch: "Las contraseñas no coinciden.",
+    errorExists: "Ya hay una cuenta con ese email. Intenta entrar en vez de registrarte.",
+    recoveredNotice: "Contraseña actualizada. Ya puedes entrar con ella.",
     forgotTitle: "Recuperar contraseña",
-    forgotBody:
-      "La recuperación real de contraseña necesita Appwrite Authentication enviando un email de verdad; llega cuando se conecte Appwrite.",
+    forgotBody: "Escribe tu email y te mandamos un enlace para elegir una contraseña nueva.",
+    forgotSubmit: "Enviar enlace",
+    forgotSent:
+      "Si ese email tiene una cuenta, te hemos mandado un enlace para restablecer la contraseña. Revisa también la carpeta de spam.",
+    resetTitle: "Elige una contraseña nueva",
+    resetSubmit: "Guardar contraseña",
+    resetInvalidLink:
+      "Este enlace ya no es válido o ha caducado. Pide uno nuevo desde «¿Has olvidado la contraseña?».",
   },
   cookiesBanner: {
     message:
@@ -69,8 +75,6 @@ const es = {
     policyLink: "Política de cookies",
   },
   panel: {
-    demoBanner:
-      "Estás en modo demostración. Los datos se guardan solo en este navegador y desaparecen si lo borras.",
     nav: {
       dashboard: "Resumen",
       clientes: "Clientes",
@@ -80,6 +84,9 @@ const es = {
       ajustes: "Ajustes",
     },
     logout: "Cerrar sesión",
+    errorLoad: "No se han podido cargar tus datos. Comprueba tu conexión y recarga la página.",
+    errorSave: "No se ha podido guardar ese cambio. Vuelve a intentarlo.",
+    dismiss: "Cerrar aviso",
     tour: "Tour",
     tourTitle: "Visita guiada",
     tourNext: "Siguiente",
@@ -121,7 +128,7 @@ const es = {
     exportData: "Exportar mis datos",
     deleteAccount: "Borrar mi cuenta",
     deleteAccountConfirm:
-      "Esto borra todos tus clientes, obras y presupuestos de este navegador de forma permanente. ¿Seguro?",
+      "Esto borra tu cuenta y todos tus clientes, obras y presupuestos de nuestros servidores de forma permanente e irreversible. ¿Seguro?",
   },
   clientes: {
     title: "Clientes",

@@ -1,207 +1,108 @@
-# Presurapi — diseño del backend en Appwrite
+# Presurapi — backend en Appwrite
 
-Sustituye al diseño de `supabase/migrations/` (Fase 2 original). Este documento
-es el plan; se aplica de verdad con las herramientas MCP de Appwrite en cuanto
-haya una sesión con la autenticación completada — no es un fichero que
-Appwrite vaya a leer directamente.
+Este documento describe el backend real ya creado en Appwrite (proyecto
+`presurapi`, región Frankfurt) y por qué su forma difiere en algunos puntos
+del diseño original pensado para Supabase/Postgres.
 
 ## Por qué cambia la forma del esquema, no solo el proveedor
 
 Appwrite no tiene Row Level Security estilo Postgres (una política SQL que
 evalúa un `join` en cada fila). Su modelo de seguridad es **permisos por
-documento**: cada documento lleva su propia lista de "quién puede
-leer/escribir", y hay que activarla (`documentSecurity`) por colección. No
-existe un equivalente directo a "este capítulo es tuyo si el presupuesto al
-que pertenece es tuyo" evaluado automáticamente en cada consulta.
+documento**: cada fila lleva su propia lista de "quién puede leer/escribir",
+activada (`rowSecurity`) por tabla. No existe un equivalente directo a "este
+capítulo es tuyo si el presupuesto al que pertenece es tuyo" evaluado
+automáticamente en cada consulta.
 
-Por eso, los documentos que antes dependían de una cadena de `join` para
-saber su dueño (`capitulos`, `partidas`, `partida_materiales`,
-`partida_mano_obra`) llevan aquí su propio campo `user_id`, con permisos de
-documento fijados al crearlos — en vez de depender de a qué presupuesto
-pertenecen. Es más repetitivo que la RLS de Postgres, pero es el patrón
-nativo y correcto en Appwrite (igual de seguro, aplicado distinto).
+Por eso, las filas que antes dependían de una cadena de `join` para saber su
+dueño (`capitulos`, `partidas`) llevan su propio campo `user_id`, con
+permisos de fila fijados al crearlas — en vez de depender de a qué
+presupuesto pertenecen. Es más repetitivo que la RLS de Postgres, pero es el
+patrón nativo y correcto en Appwrite (igual de seguro, aplicado distinto).
 
 ## Autenticación
 
-Appwrite Authentication sustituye a Supabase Auth: email + contraseña,
-verificación de email, recuperación de contraseña — las mismas piezas que
-pedía el proyecto original, nativas de Appwrite, sin tener que montarlas a
-mano.
+Appwrite Authentication (email + contraseña, recuperación de contraseña).
+Las server actions (`src/app/acciones/auth.ts`) crean la sesión con la API
+key de servidor (nunca desde el navegador) y guardan el secreto en una
+cookie `httpOnly` propia (`presurapi_session`); ver `src/lib/appwrite/server.ts`.
 
 ## Base de datos: `presurapi`
 
-Todas las colecciones viven en una base de datos Appwrite llamada
-`presurapi`. Catálogos globales (`materiales`, `trabajos`,
-`trabajo_materiales`, `trabajo_mano_obra`): solo lectura para usuarios
-autenticados (`read: role:users`), sin permisos de escritura para ellos —
-los mantiene quien tenga la API key de servidor. El resto: `documentSecurity`
-activado, sin permisos a nivel de colección salvo `create: role:users`
-(cualquier usuario autenticado puede crear sus propios documentos); lectura,
-actualización y borrado se conceden documento a documento a
-`Role.user(userId)` al crearlo.
+Siete tablas, todas con `rowSecurity: true` salvo donde se indica. Salvo
+`perfiles` (que solo crea el servidor), el permiso de tabla es
+`create("users")`: cualquier usuario autenticado puede crear sus propias
+filas; lectura/actualización/borrado se conceden fila a fila a
+`Role.user(userId)` al crearla.
 
 ### `perfiles`
 
-Un documento por usuario; **el ID del documento es el propio userId** (igual
-que en Supabase la PK de `perfiles` era `auth.users.id`), así se busca sin
-necesidad de índice adicional.
+Un documento por usuario; **el ID de la fila es el propio userId**. Sin
+permisos de tabla (solo la crea el servidor, con la API key, justo después
+del registro — ver `registrar()` en `auth.ts`).
 
-| Atributo | Tipo | Notas |
+| Columna | Tipo | Notas |
 |---|---|---|
-| nombre_empresa | string | vacío hasta que el usuario lo rellena |
-| nif_empresa | string | |
-| direccion_empresa | string | |
-| telefono_empresa | string | |
-| email_empresa | string (email) | |
-| logo_file_id | string | ID del fichero en el bucket `logos`, nullable |
-| precio_hora_oficial | float, nullable | NULL = sin fijar, usa el valor por defecto |
-| precio_hora_peon | float, nullable | ídem |
-| gastos_generales_pct | float | por defecto 13 |
-| beneficio_industrial_pct | float | por defecto 6 |
-| iva_pct | float | por defecto 21 |
-| idioma | enum (es, en) | |
-
-Permisos: `read`, `update` → `Role.user(userId)` (documento = el propio
-usuario). Se crea automáticamente con una Appwrite Function disparada por el
-evento `users.*.create` (equivalente al trigger `handle_new_user` de
-Postgres).
+| nombre_empresa, nif_empresa, direccion_empresa, telefono_empresa | string | por defecto `""` |
+| email_empresa | email, sin valor por defecto | llega como `null` hasta que el usuario lo rellena; el store lo normaliza a `""` |
+| email_cuenta | email | copia del email de la cuenta, guardada al registrarse |
+| logo_data_url | longtext | `data:` URL del logo subido en Ajustes, sin bucket de Storage |
+| precio_hora_oficial, precio_hora_peon | double, sin valor por defecto | `null` = sin fijar, usa el valor por defecto de `calculo.ts` |
+| gastos_generales_pct, beneficio_industrial_pct, iva_pct | double | 13 / 6 / 21 por defecto |
+| idioma | enum (es, en) | por defecto `es` |
 
 ### `clientes`
 
-| Atributo | Tipo |
-|---|---|
-| user_id | string, indexado |
-| nombre | string |
-| nif | string |
-| email | string |
-| telefono | string |
-| direccion | string |
-| notas | string |
-| estado | enum (activo, archivado) |
-
-Permisos por documento: `read/update/delete` → `Role.user(user_id)`.
+user_id (indexado), nombre, nif, email, telefono, direccion, notas (text),
+estado (enum activo/archivado, por defecto activo).
 
 ### `obras`
 
-| Atributo | Tipo |
-|---|---|
-| user_id | string, indexado |
-| cliente_id | string, indexado |
-| nombre | string |
-| direccion | string |
-| descripcion | string |
-| estado | enum (activa, archivada) |
+user_id (indexado), cliente_id (indexado), nombre, direccion, descripcion
+(text), estado (enum activa/archivada, por defecto activa).
 
-Mismo patrón de permisos que `clientes`.
+### `precios_usuario`
 
-### `materiales` (banco de precios, catálogo global)
-
-| Atributo | Tipo |
-|---|---|
-| nombre | string |
-| unidad | enum (m2, ml, ud, kg, l, saco, h) |
-| precio_referencia | float |
-| fuente | string |
-| fecha_actualizacion | datetime |
-| categoria | string, indexado |
-
-Permisos de colección: `read: role:users`; sin create/update/delete para
-usuarios (gestionado por servidor).
-
-### `precios_usuario` (precio propio, prioridad sobre el de referencia)
-
-| Atributo | Tipo |
-|---|---|
-| user_id | string, indexado |
-| material_id | string, indexado |
-| precio | float |
-
-Índice único compuesto `(user_id, material_id)`. Permisos por documento:
-`Role.user(user_id)`.
-
-### `trabajos`, `trabajo_materiales`, `trabajo_mano_obra` (catálogo global)
-
-Mismos campos que en `supabase/seed.sql` (slug, nombre, unidad, descripción;
-receta de materiales por unidad; horas de oficial/peón por unidad). Mismo
-patrón de permisos de solo lectura que `materiales`.
+Precio propio del usuario para un material del catálogo, con prioridad sobre
+el precio de referencia. user_id (indexado), material_nombre, precio
+(double). Índice único compuesto `(user_id, material_nombre)`.
 
 ### `presupuestos`
 
-| Atributo | Tipo |
-|---|---|
-| user_id | string, indexado |
-| obra_id | string, indexado |
-| numero | integer |
-| estado | enum (borrador, enviado, aceptado, rechazado) |
-| precio_hora_oficial, precio_hora_peon | float — snapshot al crear |
-| gastos_generales_pct, beneficio_industrial_pct, iva_pct | float — snapshot |
-| subtotal_materiales, subtotal_mano_obra | float |
-| gastos_generales_importe, beneficio_industrial_importe | float |
-| base_imponible, iva_importe, total | float |
-| notas | string |
-| token_publico | string, índice único — enlace público de solo lectura |
-| enviado_at | datetime, nullable |
-
-Índice único compuesto `(user_id, numero)`. Permisos por documento:
-`Role.user(user_id)`. El enlace público (`/p/[token]`) se resuelve con una
-Appwrite Function server-side usando la API key, nunca dando permiso de
-lectura a `role:any` sobre el documento completo.
+user_id (indexado), obra_id (indexado), numero (integer), estado (enum
+borrador/enviado/aceptado/rechazado), snapshot de tarifas y porcentajes al
+crearlo, subtotales e importes calculados, notas (text). Índice único
+compuesto `(user_id, numero)` para la numeración por usuario.
 
 ### `capitulos`
 
-| Atributo | Tipo |
-|---|---|
-| user_id | string, indexado — **denormalizado desde el presupuesto, ver más arriba** |
-| presupuesto_id | string, indexado |
-| nombre | string |
-| posicion | integer |
+user_id (indexado, denormalizado desde el presupuesto — ver más arriba),
+presupuesto_id (indexado), nombre, posicion.
 
 ### `partidas`
 
-| Atributo | Tipo |
-|---|---|
-| user_id | string, indexado |
-| capitulo_id | string, indexado |
-| trabajo_slug | string, nullable |
-| descripcion | string |
-| unidad | enum (m2, ml, ud, h) |
-| medicion | float |
-| importe_materiales, importe_mano_obra | float |
-| precio_unitario, importe | float |
-| posicion | integer |
+user_id (indexado), capitulo_id (indexado), trabajo_slug, descripcion,
+unidad (enum m2/ml/ud/h), medicion, importes calculados, posicion. Las
+líneas de materiales y mano de obra se guardan como JSON en
+`materiales_json`/`mano_obra_json` (columnas `longtext`) en vez de en tablas
+aparte `partida_materiales`/`partida_mano_obra`: son 2-3 líneas por partida,
+nunca se consultan sueltas de la partida que las contiene, así que
+normalizarlas solo añadiría llamadas sin ningún beneficio real.
 
-### `partida_materiales` / `partida_mano_obra`
+## Lo que no se implementó (y por qué)
 
-Igual que en Supabase (snapshot de nombre/precio de material, o de
-rol/horas/precio-hora de mano de obra), más `user_id` denormalizado para el
-permiso de documento.
-
-## Storage
-
-Bucket `logos`: permisos por fichero, `Role.user(userId)` al subir — mismo
-criterio que el bucket privado de Supabase Storage.
-
-## Lo que todavía no está decidido
-
-- **IDs de referencia simples (string) vs. relationships nativas de
-  Appwrite**: este diseño usa IDs simples (igual que los tipos TS ya
-  construidos en `src/lib/demo/types.ts`), para que portar la demo cueste lo
-  mínimo. Las relationships nativas de Appwrite permitirían traer datos
-  relacionados en una sola consulta, a cambio de más complejidad; se puede
-  añadir después si hace falta.
-- **Appwrite Functions** para: crear el perfil al registrarse, mantener
-  `numero` de presupuesto secuencial por usuario de forma atómica, y
-  resolver el enlace público del presupuesto.
-
-## Próximos pasos (necesitan la sesión con Appwrite autenticado)
-
-1. Crear la base de datos `presurapi` y las colecciones de este documento
-   con las herramientas MCP de Appwrite.
-2. Sembrar `materiales` y `trabajos` con los mismos datos de
-   `supabase/seed.sql`.
-3. Sustituir `src/lib/demo/store.tsx` por un cliente real de Appwrite
-   (mismo patrón que se iba a hacer con `src/lib/supabase/*`), manteniendo
-   intactas `src/lib/demo/calculo.ts` y `src/lib/demo/catalog.ts` (no
-   dependen de dónde viven los datos).
-4. Conectar `Appwrite Authentication` en las páginas de entrar/registro,
-   sustituyendo el inicio de sesión simulado.
+- **`materiales`/`trabajos`/`trabajo_materiales`/`trabajo_mano_obra` como
+  tablas de Appwrite**: nadie los edita desde la app (son de solo lectura),
+  así que siguen viviendo en `src/lib/demo/catalog.ts`, empaquetados con el
+  código. Moverlos a Appwrite solo tendría sentido si en el futuro se quiere
+  editar el banco de precios sin desplegar código.
+- **Bucket de Storage para el logo**: una imagen pequeña como `data:` URL en
+  una columna `longtext` de `perfiles` evita montar todo un flujo de subida
+  de ficheros (bucket, permisos por fichero, URLs firmadas) para un caso de
+  uso tan simple.
+- **Enlace público de presupuesto (`/p/[token]`)**: no llegó a construirse
+  en la demo tampoco, así que no es una regresión; se puede añadir más
+  adelante con una Appwrite Function que resuelva el token server-side.
+- **Appwrite Functions**: no hicieron falta. Crear el perfil al registrarse
+  y mantener el número de presupuesto secuencial se hacen directamente en
+  las server actions / el store con la API key o la sesión del propio
+  usuario, sin necesitar código desplegado por separado en Appwrite.

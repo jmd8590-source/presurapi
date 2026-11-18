@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { DEMO_SESSION_COOKIE } from "@/lib/demo/session";
+import { SESSION_COOKIE } from "@/lib/appwrite/config";
 
-// Protege /panel mientras no hay Appwrite Authentication: exige la cookie de
-// sesión de demostración (ver src/lib/demo/session.ts). Cuando se conecte
-// Appwrite, esto se sustituye por la comprobación de sesión real.
+// Primera barrera para /panel: solo mira si existe la cookie de sesión (no
+// hace ninguna llamada a Appwrite, el middleware corre en el edge en cada
+// petición). La comprobación de verdad —si la sesión sigue siendo válida en
+// Appwrite— la hace panel/layout.tsx con getLoggedInUser().
 export function proxy(request: NextRequest) {
-  const tieneSesionDemo = request.cookies.has(DEMO_SESSION_COOKIE);
+  const tieneCookieSesion = request.cookies.has(SESSION_COOKIE);
 
-  if (!tieneSesionDemo && request.nextUrl.pathname.startsWith("/panel")) {
+  if (!tieneCookieSesion && request.nextUrl.pathname.startsWith("/panel")) {
     const url = request.nextUrl.clone();
     url.pathname = "/entrar";
     url.searchParams.set("next", request.nextUrl.pathname);

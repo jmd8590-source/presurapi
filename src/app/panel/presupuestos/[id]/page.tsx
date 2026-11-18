@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
-import { useDemoStore } from "@/lib/demo/store";
+import { useAppwriteStore } from "@/lib/appwrite/store";
 import { TRABAJOS } from "@/lib/demo/catalog";
 import { descargarPdf, generarPresupuestoPdf } from "@/lib/demo/pdf";
 import type { EstadoPresupuesto } from "@/lib/demo/types";
@@ -21,7 +21,7 @@ const estadoLabelKey: Record<EstadoPresupuesto, "presupuestos.statusBorrador" | 
 
 function NuevaPartida({ capituloId }: { capituloId: string }) {
   const { t } = useLocale();
-  const { agregarPartidaDesdeTrabajo } = useDemoStore();
+  const { agregarPartidaDesdeTrabajo } = useAppwriteStore();
   const [trabajoSlug, setTrabajoSlug] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [medicion, setMedicion] = useState("");
@@ -46,8 +46,11 @@ function NuevaPartida({ capituloId }: { capituloId: string }) {
   return (
     <form onSubmit={onSubmit} className="mt-2 flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-(--color-ink-muted)">{t("presupuestos.chooseJob")}</label>
+        <label htmlFor={`trabajo-${capituloId}`} className="text-xs text-(--color-ink-muted)">
+          {t("presupuestos.chooseJob")}
+        </label>
         <select
+          id={`trabajo-${capituloId}`}
           required
           className={`${inputClase} min-w-[220px]`}
           value={trabajoSlug}
@@ -68,18 +71,22 @@ function NuevaPartida({ capituloId }: { capituloId: string }) {
         </select>
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-(--color-ink-muted)">{t("presupuestos.description")}</label>
+        <label htmlFor={`descripcion-${capituloId}`} className="text-xs text-(--color-ink-muted)">
+          {t("presupuestos.description")}
+        </label>
         <input
+          id={`descripcion-${capituloId}`}
           className={inputClase}
           value={descripcion}
           onChange={(e) => setDescripcion(e.target.value)}
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-(--color-ink-muted)">
+        <label htmlFor={`medicion-${capituloId}`} className="text-xs text-(--color-ink-muted)">
           {t("presupuestos.measurement")} {trabajo ? `(${trabajo.unidad})` : ""}
         </label>
         <input
+          id={`medicion-${capituloId}`}
           required
           type="number"
           min={0.01}
@@ -110,7 +117,7 @@ export default function PresupuestoPage() {
     eliminarPartida,
     cambiarEstadoPresupuesto,
     actualizarNotasPresupuesto,
-  } = useDemoStore();
+  } = useAppwriteStore();
   const [nuevoCapitulo, setNuevoCapitulo] = useState("");
 
   if (!listo) return null;
