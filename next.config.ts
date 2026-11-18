@@ -6,7 +6,7 @@ import type { NextConfig } from "next";
 // frente a inyección. `'unsafe-inline'` en script-src cubre el único script
 // inline (corrección del tema antes del pintado, ver src/app/layout.tsx);
 // en style-src cubre los estilos de Tailwind. connect-src se ampliará con
-// la URL del proyecto Supabase cuando exista (Fase 2 pendiente de conectar).
+// el endpoint de Appwrite cuando se conecte (ver appwrite/DISENO.md).
 const isDev = process.env.NODE_ENV === "development";
 
 const csp = [

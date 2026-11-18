@@ -2,7 +2,8 @@
 
 // Almacén de datos de la demo: vive en localStorage del navegador, nunca en
 // un servidor. Expone las mismas operaciones que tendría un repositorio
-// sobre Supabase, para que sea sencillo sustituirlo más adelante.
+// sobre Appwrite (ver appwrite/DISENO.md), para que sea sencillo
+// sustituirlo más adelante.
 import {
   createContext,
   useCallback,

@@ -1,8 +1,9 @@
 // Banco de precios y catálogo de trabajos de la demo.
 //
-// Mismos datos que supabase/seed.sql, porteados a TypeScript porque en modo
-// demo no hay base de datos. Cuando exista el proyecto Supabase real, este
-// catálogo se sustituye por una consulta a `materiales`/`trabajos`.
+// Mismos datos que las colecciones `materiales`/`trabajos` descritas en
+// appwrite/DISENO.md, porteados a TypeScript porque en modo demo no hay
+// base de datos. Cuando se conecte Appwrite, este catálogo se sustituye por
+// una consulta a esas colecciones.
 import type { RolManoObra, UnidadMaterial, UnidadTrabajo } from "./types";
 
 export interface Material {

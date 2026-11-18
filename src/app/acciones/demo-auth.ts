@@ -7,8 +7,8 @@ import { DEMO_SESSION_COOKIE } from "@/lib/demo/session";
 
 // Acciones de la sesión de demostración: NO verifican contraseña ni email
 // real, solo guardan el email en una cookie para poder enseñar el panel.
-// El login/registro de verdad (Supabase Auth, verificación de email) llega
-// cuando exista el proyecto Supabase.
+// El login/registro de verdad (Appwrite Authentication, verificación de
+// email) llega cuando se conecte Appwrite — ver appwrite/DISENO.md.
 
 const credencialesSchema = z.object({
   email: z.string().trim().email(),

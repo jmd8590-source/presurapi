@@ -14,7 +14,7 @@ export default function PrivacidadPage() {
         <>
           Esta app está en <strong>modo demostración</strong>: el login no verifica contraseñas
           reales y los datos (clientes, obras, presupuestos) se guardan solo en tu navegador,
-          no en ningún servidor. Los apartados sobre Supabase y envío de email describen cómo
+          no en ningún servidor. Los apartados sobre Appwrite y envío de email describen cómo
           funcionará cuando se conecte el backend real.
         </>
       }
@@ -22,7 +22,7 @@ export default function PrivacidadPage() {
         <>
           This app is in <strong>demo mode</strong>: sign-in does not verify real passwords and
           data (clients, projects, quotes) is saved only in your browser, not on any server. The
-          sections about Supabase and email sending describe how it will work once the real
+          sections about Appwrite and email sending describe how it will work once the real
           backend is connected.
         </>
       }
@@ -83,8 +83,8 @@ export default function PrivacidadPage() {
           body: (
             <ul className="list-disc pl-5">
               <li>
-                Supabase (base de datos, autenticación y almacenamiento): se usará cuando se
-                conecte el proyecto real; mientras tanto no se envía ningún dato a Supabase.
+                Appwrite (base de datos, autenticación y almacenamiento): se usará cuando se
+                conecte el proyecto real; mientras tanto no se envía ningún dato a Appwrite.
               </li>
               <li>
                 Resend (envío de emails con el PDF del presupuesto): se activará cuando el
@@ -123,10 +123,9 @@ export default function PrivacidadPage() {
           heading: "8. Seguridad",
           body: (
             <p>
-              El acceso a cada dato se restringe por usuario (Row Level Security a nivel de
-              base de datos cuando el proyecto Supabase esté conectado), las conexiones viajan
-              cifradas (HTTPS) y aplicamos cabeceras de seguridad conforme a buenas prácticas
-              OWASP.
+              El acceso a cada dato se restringe por usuario (permisos por documento a nivel de
+              base de datos cuando Appwrite esté conectado), las conexiones viajan cifradas
+              (HTTPS) y aplicamos cabeceras de seguridad conforme a buenas prácticas OWASP.
             </p>
           ),
         },
@@ -194,8 +193,8 @@ export default function PrivacidadPage() {
           body: (
             <ul className="list-disc pl-5">
               <li>
-                Supabase (database, authentication and storage): will be used once the real
-                project is connected; no data is sent to Supabase in the meantime.
+                Appwrite (database, authentication and storage): will be used once the real
+                project is connected; no data is sent to Appwrite in the meantime.
               </li>
               <li>
                 Resend (emailing the quote PDF): activated once the user configures their own
@@ -233,9 +232,9 @@ export default function PrivacidadPage() {
           heading: "8. Security",
           body: (
             <p>
-              Access to each piece of data is restricted per user (database-level Row Level
-              Security once the Supabase project is connected), connections are encrypted
-              (HTTPS), and we apply security headers following OWASP good practice.
+              Access to each piece of data is restricted per user (database-level document
+              permissions once Appwrite is connected), connections are encrypted (HTTPS), and
+              we apply security headers following OWASP good practice.
             </p>
           ),
         },

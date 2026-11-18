@@ -1,7 +1,7 @@
 // Sesión de la demo: una cookie con el email introducido, SIN verificar
 // contraseña ni email real. No es autenticación de verdad — eso llega con
-// Supabase Auth cuando exista el proyecto. Se usa solo para enseñar el
-// recorrido completo (login → panel) sin backend.
+// Appwrite Authentication cuando se conecte (ver appwrite/DISENO.md). Se usa
+// solo para enseñar el recorrido completo (login → panel) sin backend.
 import "server-only";
 import { cookies } from "next/headers";
 

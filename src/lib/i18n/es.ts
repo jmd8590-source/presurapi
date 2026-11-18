@@ -53,7 +53,7 @@ const es = {
     errorPasswordMismatch: "Las contraseñas no coinciden.",
     forgotTitle: "Recuperar contraseña",
     forgotBody:
-      "La recuperación real de contraseña necesita Supabase Auth enviando un email de verdad; llega cuando exista el proyecto Supabase.",
+      "La recuperación real de contraseña necesita Appwrite Authentication enviando un email de verdad; llega cuando se conecte Appwrite.",
   },
   cookiesBanner: {
     message:

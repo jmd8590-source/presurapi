@@ -1,6 +1,6 @@
 // Cálculo de partidas y totales de presupuesto.
 //
-// Funciones puras: no dependen de localStorage ni de Supabase, así que
+// Funciones puras: no dependen de localStorage ni de Appwrite, así que
 // sirven igual en la demo y el día que haya base de datos real (la lógica
 // de negocio no cambia, solo de dónde vienen los datos).
 import { getMaterial, getTrabajo } from "./catalog";

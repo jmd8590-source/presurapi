@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { DEMO_SESSION_COOKIE } from "@/lib/demo/session";
 
-// Protege /panel mientras no hay Supabase Auth: exige la cookie de sesión de
-// demostración (ver src/lib/demo/session.ts). Cuando exista el proyecto
-// Supabase real, esto se sustituye por el refresco de sesión de @supabase/ssr.
+// Protege /panel mientras no hay Appwrite Authentication: exige la cookie de
+// sesión de demostración (ver src/lib/demo/session.ts). Cuando se conecte
+// Appwrite, esto se sustituye por la comprobación de sesión real.
 export function proxy(request: NextRequest) {
   const tieneSesionDemo = request.cookies.has(DEMO_SESSION_COOKIE);
 

@@ -1,7 +1,7 @@
 "use client";
 
 // Generación del PDF del presupuesto, enteramente en el navegador (pdf-lib):
-// no necesita servidor, así que funciona igual en la demo que con Supabase
+// no necesita servidor, así que funciona igual en la demo que con el backend
 // real más adelante. Fuentes estándar (WinAnsi) para no tener que empaquetar
 // tipografías: cubren tildes, ñ y el símbolo € sin problema.
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";

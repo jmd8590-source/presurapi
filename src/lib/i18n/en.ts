@@ -55,7 +55,7 @@ const en: typeof es = {
     errorPasswordMismatch: "Passwords don't match.",
     forgotTitle: "Reset password",
     forgotBody:
-      "Real password recovery needs Supabase Auth sending a real email; it arrives once the Supabase project exists.",
+      "Real password recovery needs Appwrite Authentication sending a real email; it arrives once Appwrite is connected.",
   },
   cookiesBanner: {
     message:

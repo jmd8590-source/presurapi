@@ -1,10 +1,9 @@
 // Tipos de la capa de datos de demostración.
 //
-// Los nombres de campo imitan a propósito las columnas de
-// supabase/migrations/20261117120000_initial_schema.sql (snake_case) en vez
-// del camelCase habitual en TS: así, cuando exista el proyecto Supabase real,
-// sustituir este módulo por llamadas a supabase-js no obliga a renombrar
-// nada en los componentes que ya consumen estos datos.
+// Los nombres de campo imitan a propósito los atributos descritos en
+// appwrite/DISENO.md (snake_case) en vez del camelCase habitual en TS: así,
+// cuando se conecte Appwrite, sustituir este módulo por llamadas reales no
+// obliga a renombrar nada en los componentes que ya consumen estos datos.
 
 export type Idioma = "es" | "en";
 export type UnidadMaterial = "m2" | "ml" | "ud" | "kg" | "l" | "saco" | "h";
