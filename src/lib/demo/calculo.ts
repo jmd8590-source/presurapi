@@ -5,6 +5,7 @@
 // de negocio no cambia, solo de dónde vienen los datos).
 import { getMaterial, getTrabajo } from "./catalog";
 import type {
+  MaterialPropio,
   Partida,
   PartidaManoObraLinea,
   PartidaMaterialLinea,
@@ -85,6 +86,59 @@ export function calcularPartidaDesdeTrabajo(
     importe_materiales,
     importe_mano_obra,
     precio_unitario: medicion > 0 ? redondea(importe / medicion) : 0,
+    importe,
+  };
+}
+
+// A diferencia de calcularPartidaDesdeTrabajo, un material propio no trae
+// receta (no sabemos cuánto material ni cuántas horas lleva cada unidad de
+// obra), así que aquí la cantidad y las horas de mano de obra las decide el
+// usuario directamente para esa partida en concreto.
+export function calcularPartidaDesdeMaterialPropio(
+  material: MaterialPropio,
+  cantidad: number,
+  horasOficial: number,
+  horasPeon: number,
+  perfil: Perfil,
+): DesglosePartida {
+  const importeMaterial = redondea(cantidad * material.precio);
+  const materiales: PartidaMaterialLinea[] = [
+    {
+      material_nombre: material.nombre,
+      cantidad: redondea(cantidad),
+      precio_unitario: material.precio,
+      importe: importeMaterial,
+    },
+  ];
+
+  const tarifas = { oficial: precioHoraOficial(perfil), peon: precioHoraPeon(perfil) };
+  const mano_obra: PartidaManoObraLinea[] = (
+    [
+      { rol: "oficial" as const, horas: horasOficial },
+      { rol: "peon" as const, horas: horasPeon },
+    ] satisfies { rol: "oficial" | "peon"; horas: number }[]
+  )
+    .filter((linea) => linea.horas > 0)
+    .map((linea) => {
+      const precio_hora = tarifas[linea.rol];
+      return {
+        rol: linea.rol,
+        horas: redondea(linea.horas),
+        precio_hora,
+        importe: redondea(linea.horas * precio_hora),
+      };
+    });
+
+  const importe_materiales = importeMaterial;
+  const importe_mano_obra = redondea(mano_obra.reduce((acc, m) => acc + m.importe, 0));
+  const importe = redondea(importe_materiales + importe_mano_obra);
+
+  return {
+    materiales,
+    mano_obra,
+    importe_materiales,
+    importe_mano_obra,
+    precio_unitario: cantidad > 0 ? redondea(importe / cantidad) : 0,
     importe,
   };
 }

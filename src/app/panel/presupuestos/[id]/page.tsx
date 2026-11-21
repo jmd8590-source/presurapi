@@ -19,7 +19,7 @@ const estadoLabelKey: Record<EstadoPresupuesto, "presupuestos.statusBorrador" | 
   rechazado: "presupuestos.statusRechazado",
 };
 
-function NuevaPartida({ capituloId }: { capituloId: string }) {
+function NuevaPartidaDesdeTrabajo({ capituloId }: { capituloId: string }) {
   const { t } = useLocale();
   const { agregarPartidaDesdeTrabajo } = useAppwriteStore();
   const [trabajoSlug, setTrabajoSlug] = useState("");
@@ -103,6 +103,175 @@ function NuevaPartida({ capituloId }: { capituloId: string }) {
         {t("presupuestos.addLineConfirm")}
       </button>
     </form>
+  );
+}
+
+function NuevaPartidaDesdeMaterialPropio({ capituloId }: { capituloId: string }) {
+  const { t } = useLocale();
+  const { db, agregarPartidaDesdeMaterialPropio } = useAppwriteStore();
+  const [materialId, setMaterialId] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [cantidad, setCantidad] = useState("");
+  const [horasOficial, setHorasOficial] = useState("");
+  const [horasPeon, setHorasPeon] = useState("");
+
+  const material = db.materiales_propios.find((m) => m.id === materialId);
+
+  if (db.materiales_propios.length === 0) {
+    return (
+      <p className="mt-2 text-sm text-(--color-ink-muted)">
+        {t("presupuestos.noOwnMaterials")}{" "}
+        <Link href="/panel/banco" className="text-(--color-brass) hover:underline">
+          {t("presupuestos.noOwnMaterialsLink")}
+        </Link>
+      </p>
+    );
+  }
+
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const valorCantidad = Number(cantidad);
+    if (!materialId || !valorCantidad || valorCantidad <= 0) return;
+    agregarPartidaDesdeMaterialPropio(
+      capituloId,
+      materialId,
+      descripcion.trim() || (material?.nombre ?? ""),
+      valorCantidad,
+      Number(horasOficial) || 0,
+      Number(horasPeon) || 0,
+    );
+    setMaterialId("");
+    setDescripcion("");
+    setCantidad("");
+    setHorasOficial("");
+    setHorasPeon("");
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="mt-2 flex flex-wrap items-end gap-2">
+      <div className="flex flex-col gap-1">
+        <label htmlFor={`material-${capituloId}`} className="text-xs text-(--color-ink-muted)">
+          {t("presupuestos.chooseMaterial")}
+        </label>
+        <select
+          id={`material-${capituloId}`}
+          required
+          className={`${inputClase} min-w-[220px]`}
+          value={materialId}
+          onChange={(e) => {
+            setMaterialId(e.target.value);
+            const m = db.materiales_propios.find((x) => x.id === e.target.value);
+            if (m) setDescripcion(m.nombre);
+          }}
+        >
+          <option value="" disabled>
+            {t("presupuestos.chooseMaterial")}
+          </option>
+          {db.materiales_propios.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.nombre} ({m.unidad})
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="flex flex-col gap-1">
+        <label
+          htmlFor={`descripcion-material-${capituloId}`}
+          className="text-xs text-(--color-ink-muted)"
+        >
+          {t("presupuestos.description")}
+        </label>
+        <input
+          id={`descripcion-material-${capituloId}`}
+          className={inputClase}
+          value={descripcion}
+          onChange={(e) => setDescripcion(e.target.value)}
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label htmlFor={`cantidad-${capituloId}`} className="text-xs text-(--color-ink-muted)">
+          {t("presupuestos.quantity")} {material ? `(${material.unidad})` : ""}
+        </label>
+        <input
+          id={`cantidad-${capituloId}`}
+          required
+          type="number"
+          min={0.01}
+          step="0.01"
+          className={`${inputClase} w-24`}
+          value={cantidad}
+          onChange={(e) => setCantidad(e.target.value)}
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label htmlFor={`horas-oficial-${capituloId}`} className="text-xs text-(--color-ink-muted)">
+          {t("presupuestos.laborOficialHours")}
+        </label>
+        <input
+          id={`horas-oficial-${capituloId}`}
+          type="number"
+          min={0}
+          step="0.25"
+          className={`${inputClase} w-24`}
+          value={horasOficial}
+          onChange={(e) => setHorasOficial(e.target.value)}
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label htmlFor={`horas-peon-${capituloId}`} className="text-xs text-(--color-ink-muted)">
+          {t("presupuestos.laborPeonHours")}
+        </label>
+        <input
+          id={`horas-peon-${capituloId}`}
+          type="number"
+          min={0}
+          step="0.25"
+          className={`${inputClase} w-24`}
+          value={horasPeon}
+          onChange={(e) => setHorasPeon(e.target.value)}
+        />
+      </div>
+      <button
+        type="submit"
+        className="rounded-sm bg-(--color-brass) px-4 py-2.5 text-sm font-semibold text-(--color-brass-contrast) hover:bg-(--color-brass-hover)"
+      >
+        {t("presupuestos.addLineConfirm")}
+      </button>
+    </form>
+  );
+}
+
+function NuevaPartida({ capituloId }: { capituloId: string }) {
+  const { t } = useLocale();
+  const [modo, setModo] = useState<"trabajo" | "material">("trabajo");
+
+  const modoClase = (activo: boolean) =>
+    `rounded-sm px-3 py-1.5 text-xs font-medium ${
+      activo
+        ? "bg-(--color-brass) text-(--color-brass-contrast)"
+        : "border border-(--color-border-strong) text-(--color-ink-muted) hover:border-(--color-brass)"
+    }`;
+
+  return (
+    <div>
+      <div className="mt-3 flex gap-2">
+        <button type="button" onClick={() => setModo("trabajo")} className={modoClase(modo === "trabajo")}>
+          {t("presupuestos.modeJob")}
+        </button>
+        <button
+          type="button"
+          onClick={() => setModo("material")}
+          className={modoClase(modo === "material")}
+        >
+          {t("presupuestos.modeMaterial")}
+        </button>
+      </div>
+      {modo === "trabajo" ? (
+        <NuevaPartidaDesdeTrabajo capituloId={capituloId} />
+      ) : (
+        <NuevaPartidaDesdeMaterialPropio capituloId={capituloId} />
+      )}
+    </div>
   );
 }
 

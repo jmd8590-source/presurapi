@@ -8,7 +8,7 @@
 export type Idioma = "es" | "en";
 export type UnidadMaterial = "m2" | "ml" | "ud" | "kg" | "l" | "saco" | "h";
 export type UnidadTrabajo = "m2" | "ml" | "ud";
-export type UnidadPartida = "m2" | "ml" | "ud" | "h";
+export type UnidadPartida = UnidadMaterial;
 export type RolManoObra = "oficial" | "peon";
 export type EstadoCliente = "activo" | "archivado";
 export type EstadoObra = "activa" | "archivada";

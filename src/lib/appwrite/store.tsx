@@ -20,6 +20,7 @@ import { ID, Permission, Role, Query, type Models } from "appwrite";
 import { crearClienteNavegador } from "./client";
 import { APPWRITE_DATABASE_ID, TABLA } from "./config";
 import {
+  calcularPartidaDesdeMaterialPropio,
   calcularPartidaDesdeTrabajo,
   calcularTotalesPresupuesto,
 } from "../demo/calculo";
@@ -224,6 +225,14 @@ type AppwriteStoreValue = {
     trabajoSlug: string,
     descripcion: string,
     medicion: number,
+  ) => void;
+  agregarPartidaDesdeMaterialPropio: (
+    capituloId: string,
+    materialPropioId: string,
+    descripcion: string,
+    cantidad: number,
+    horasOficial: number,
+    horasPeon: number,
   ) => void;
   eliminarPartida: (id: string) => void;
   fijarPrecioMaterial: (materialNombre: string, precio: number) => void;
@@ -784,6 +793,74 @@ export function AppwriteDataProvider({
     [aplicar, tablesDB, userId, permisosPropios, persistirTotalesPresupuesto],
   );
 
+  const agregarPartidaDesdeMaterialPropio = useCallback<
+    AppwriteStoreValue["agregarPartidaDesdeMaterialPropio"]
+  >(
+    (capituloId, materialPropioId, descripcion, cantidad, horasOficial, horasPeon) => {
+      const db = dbRef.current;
+      const material = db.materiales_propios.find((m) => m.id === materialPropioId);
+      if (!material) return;
+      const desglose = calcularPartidaDesdeMaterialPropio(
+        material,
+        cantidad,
+        horasOficial,
+        horasPeon,
+        db.perfil,
+      );
+      const posiciones = db.partidas
+        .filter((p) => p.capitulo_id === capituloId)
+        .map((p) => p.posicion);
+      const partida: Partida = {
+        id: ID.unique(),
+        capitulo_id: capituloId,
+        trabajo_slug: null,
+        descripcion,
+        unidad: material.unidad,
+        medicion: cantidad,
+        materiales: desglose.materiales,
+        mano_obra: desglose.mano_obra,
+        importe_materiales: desglose.importe_materiales,
+        importe_mano_obra: desglose.importe_mano_obra,
+        precio_unitario: desglose.precio_unitario,
+        importe: desglose.importe,
+        posicion: (posiciones.length ? Math.max(...posiciones) : 0) + 1,
+      };
+      const presupuestoId = db.capitulos.find((c) => c.id === capituloId)?.presupuesto_id;
+
+      aplicar(
+        (db) => {
+          const siguiente = { ...db, partidas: [...db.partidas, partida] };
+          return presupuestoId ? recalcularPresupuesto(siguiente, presupuestoId) : siguiente;
+        },
+        async () => {
+          await tablesDB.createRow<Models.DefaultRow>({
+            databaseId: APPWRITE_DATABASE_ID,
+            tableId: TABLA.partidas,
+            rowId: partida.id,
+            data: {
+              user_id: userId,
+              capitulo_id: capituloId,
+              trabajo_slug: null,
+              descripcion,
+              unidad: partida.unidad,
+              medicion: cantidad,
+              materiales_json: JSON.stringify(partida.materiales),
+              mano_obra_json: JSON.stringify(partida.mano_obra),
+              importe_materiales: partida.importe_materiales,
+              importe_mano_obra: partida.importe_mano_obra,
+              precio_unitario: partida.precio_unitario,
+              importe: partida.importe,
+              posicion: partida.posicion,
+            },
+            permissions: permisosPropios(),
+          });
+          if (presupuestoId) await persistirTotalesPresupuesto(presupuestoId);
+        },
+      );
+    },
+    [aplicar, tablesDB, userId, permisosPropios, persistirTotalesPresupuesto],
+  );
+
   const eliminarPartida = useCallback<AppwriteStoreValue["eliminarPartida"]>(
     (id) => {
       const db = dbRef.current;
@@ -915,6 +992,7 @@ export function AppwriteDataProvider({
       renombrarCapitulo,
       eliminarCapitulo,
       agregarPartidaDesdeTrabajo,
+      agregarPartidaDesdeMaterialPropio,
       eliminarPartida,
       fijarPrecioMaterial,
       quitarPrecioMaterial,
@@ -940,6 +1018,7 @@ export function AppwriteDataProvider({
       renombrarCapitulo,
       eliminarCapitulo,
       agregarPartidaDesdeTrabajo,
+      agregarPartidaDesdeMaterialPropio,
       eliminarPartida,
       fijarPrecioMaterial,
       quitarPrecioMaterial,
