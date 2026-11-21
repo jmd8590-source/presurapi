@@ -205,6 +205,7 @@ export async function borrarCuentaCompleta() {
     TABLA.capitulos,
     TABLA.partidas,
     TABLA.preciosUsuario,
+    TABLA.materialesPropios,
   ];
 
   for (const tableId of tablasPropias) {

@@ -29,10 +29,13 @@ import type {
   DemoDb,
   EstadoCliente,
   EstadoObra,
+  MaterialPropio,
   Obra,
   Partida,
   Presupuesto,
   PrecioMaterialUsuario,
+  TipoObra,
+  UnidadMaterial,
 } from "../demo/types";
 
 type PrecioUsuarioFila = PrecioMaterialUsuario & { id: string };
@@ -70,6 +73,7 @@ function dbVacia(email: string): AppwriteDb {
     capitulos: [],
     partidas: [],
     precios_usuario: [],
+    materiales_propios: [],
   };
 }
 
@@ -109,6 +113,7 @@ function filaAObra(fila: Record<string, unknown>): Obra {
     nombre: fila.nombre as string,
     direccion: (fila.direccion as string) ?? "",
     descripcion: (fila.descripcion as string) ?? "",
+    tipo_obra: (fila.tipo_obra as TipoObra) ?? "nueva",
     estado: fila.estado as EstadoObra,
     created_at: fila.$createdAt as string,
     updated_at: fila.$updatedAt as string,
@@ -183,6 +188,15 @@ function filaAPrecioUsuario(fila: Record<string, unknown>): PrecioUsuarioFila {
   };
 }
 
+function filaAMaterialPropio(fila: Record<string, unknown>): MaterialPropio {
+  return {
+    id: fila.$id as string,
+    nombre: fila.nombre as string,
+    unidad: fila.unidad as UnidadMaterial,
+    precio: fila.precio as number,
+  };
+}
+
 type AppwriteStoreValue = {
   db: AppwriteDb;
   listo: boolean;
@@ -194,7 +208,9 @@ type AppwriteStoreValue = {
   ) => Cliente;
   actualizarCliente: (id: string, cambios: Partial<Cliente>) => void;
   cambiarEstadoCliente: (id: string, estado: EstadoCliente) => void;
-  crearObra: (datos: Pick<Obra, "cliente_id" | "nombre" | "direccion" | "descripcion">) => Obra;
+  crearObra: (
+    datos: Pick<Obra, "cliente_id" | "nombre" | "direccion" | "descripcion" | "tipo_obra">,
+  ) => Obra;
   actualizarObra: (id: string, cambios: Partial<Obra>) => void;
   cambiarEstadoObra: (id: string, estado: EstadoObra) => void;
   crearPresupuesto: (obraId: string) => Presupuesto;
@@ -212,6 +228,12 @@ type AppwriteStoreValue = {
   eliminarPartida: (id: string) => void;
   fijarPrecioMaterial: (materialNombre: string, precio: number) => void;
   quitarPrecioMaterial: (materialNombre: string) => void;
+  crearMaterialPropio: (datos: {
+    nombre: string;
+    unidad: UnidadMaterial;
+    precio: number;
+  }) => MaterialPropio;
+  eliminarMaterialPropio: (id: string) => void;
 };
 
 const AppwriteStoreContext = createContext<AppwriteStoreValue | null>(null);
@@ -263,8 +285,16 @@ export function AppwriteDataProvider({
     let cancelado = false;
     async function cargar() {
       const permisosUsuario = [Query.equal("user_id", userId), Query.limit(LIMITE_FILAS)];
-      const [perfilRes, clientesRes, obrasRes, presupuestosRes, capitulosRes, partidasRes, preciosRes] =
-        await Promise.all([
+      const [
+        perfilRes,
+        clientesRes,
+        obrasRes,
+        presupuestosRes,
+        capitulosRes,
+        partidasRes,
+        preciosRes,
+        materialesPropiosRes,
+      ] = await Promise.all([
           tablesDB
             .getRow({ databaseId: APPWRITE_DATABASE_ID, tableId: TABLA.perfiles, rowId: userId })
             .catch(() => null),
@@ -298,6 +328,11 @@ export function AppwriteDataProvider({
             tableId: TABLA.preciosUsuario,
             queries: permisosUsuario,
           }),
+          tablesDB.listRows({
+            databaseId: APPWRITE_DATABASE_ID,
+            tableId: TABLA.materialesPropios,
+            queries: permisosUsuario,
+          }),
         ]);
       if (cancelado) return;
 
@@ -318,6 +353,7 @@ export function AppwriteDataProvider({
         capitulos: capitulosRes.rows.map(filaACapitulo),
         partidas: partidasRes.rows.map(filaAPartida),
         precios_usuario: preciosRes.rows.map(filaAPrecioUsuario),
+        materiales_propios: materialesPropiosRes.rows.map(filaAMaterialPropio),
       };
       setDb(siguiente);
       setListo(true);
@@ -823,6 +859,42 @@ export function AppwriteDataProvider({
     [aplicar, tablesDB],
   );
 
+  const crearMaterialPropio = useCallback<AppwriteStoreValue["crearMaterialPropio"]>(
+    (datos) => {
+      const material: MaterialPropio = { id: ID.unique(), ...datos };
+      aplicar(
+        (db) => ({ ...db, materiales_propios: [...db.materiales_propios, material] }),
+        () =>
+          tablesDB.createRow<Models.DefaultRow>({
+            databaseId: APPWRITE_DATABASE_ID,
+            tableId: TABLA.materialesPropios,
+            rowId: material.id,
+            data: { ...datos, user_id: userId },
+            permissions: permisosPropios(),
+          }),
+      );
+      return material;
+    },
+    [aplicar, tablesDB, userId, permisosPropios],
+  );
+
+  const eliminarMaterialPropio = useCallback<AppwriteStoreValue["eliminarMaterialPropio"]>(
+    (id) =>
+      aplicar(
+        (db) => ({
+          ...db,
+          materiales_propios: db.materiales_propios.filter((m) => m.id !== id),
+        }),
+        () =>
+          tablesDB.deleteRow({
+            databaseId: APPWRITE_DATABASE_ID,
+            tableId: TABLA.materialesPropios,
+            rowId: id,
+          }),
+      ),
+    [aplicar, tablesDB],
+  );
+
   const value = useMemo<AppwriteStoreValue>(
     () => ({
       db,
@@ -846,6 +918,8 @@ export function AppwriteDataProvider({
       eliminarPartida,
       fijarPrecioMaterial,
       quitarPrecioMaterial,
+      crearMaterialPropio,
+      eliminarMaterialPropio,
     }),
     [
       db,
@@ -869,6 +943,8 @@ export function AppwriteDataProvider({
       eliminarPartida,
       fijarPrecioMaterial,
       quitarPrecioMaterial,
+      crearMaterialPropio,
+      eliminarMaterialPropio,
     ],
   );
 

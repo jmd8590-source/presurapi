@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import LanguageToggle from "@/components/ui/LanguageToggle";
+import Logo from "@/components/ui/Logo";
 
 export default function AuthShell({
   titleKey,
@@ -21,7 +22,11 @@ export default function AuthShell({
       className="mx-auto flex min-h-dvh w-full max-w-6xl flex-1 flex-col px-4 py-6 sm:px-6"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link href="/" className="font-display text-xl italic font-semibold text-(--color-ink)">
+        <Link
+          href="/"
+          className="flex items-center gap-2 font-display text-xl italic font-semibold text-(--color-ink)"
+        >
+          <Logo />
           {t("common.appName")}
         </Link>
         <div className="flex items-center gap-3">

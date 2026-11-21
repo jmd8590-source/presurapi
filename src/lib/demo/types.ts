@@ -12,6 +12,7 @@ export type UnidadPartida = "m2" | "ml" | "ud" | "h";
 export type RolManoObra = "oficial" | "peon";
 export type EstadoCliente = "activo" | "archivado";
 export type EstadoObra = "activa" | "archivada";
+export type TipoObra = "nueva" | "reforma";
 export type EstadoPresupuesto = "borrador" | "enviado" | "aceptado" | "rechazado";
 
 export interface Perfil {
@@ -49,6 +50,7 @@ export interface Obra {
   nombre: string;
   direccion: string;
   descripcion: string;
+  tipo_obra: TipoObra;
   estado: EstadoObra;
   created_at: string;
   updated_at: string;
@@ -118,6 +120,13 @@ export interface PrecioMaterialUsuario {
   precio: number;
 }
 
+export interface MaterialPropio {
+  id: string;
+  nombre: string;
+  unidad: UnidadMaterial;
+  precio: number;
+}
+
 export interface DemoDb {
   perfil: Perfil;
   clientes: Cliente[];
@@ -126,4 +135,5 @@ export interface DemoDb {
   capitulos: Capitulo[];
   partidas: Partida[];
   precios_usuario: PrecioMaterialUsuario[];
+  materiales_propios: MaterialPropio[];
 }

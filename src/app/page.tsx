@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import LanguageToggle from "@/components/ui/LanguageToggle";
+import Logo from "@/components/ui/Logo";
 
 export default function Home() {
   const { t } = useLocale();
@@ -12,7 +13,8 @@ export default function Home() {
     <>
       <header className="border-b border-(--color-border) bg-(--color-paper)">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <span className="font-display text-2xl italic font-semibold text-(--color-ink)">
+          <span className="flex items-center gap-2 font-display text-2xl italic font-semibold text-(--color-ink)">
+            <Logo className="h-8 w-8" />
             {t("common.appName")}
           </span>
 

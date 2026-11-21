@@ -8,6 +8,7 @@ import LanguageToggle from "@/components/ui/LanguageToggle";
 import { cerrarSesion } from "@/app/acciones/auth";
 import GuidedTour, { GuidedTourDialog } from "@/components/panel/GuidedTour";
 import TopbarMenu from "@/components/panel/TopbarMenu";
+import Logo from "@/components/ui/Logo";
 
 export default function Topbar() {
   const { t } = useLocale();
@@ -15,7 +16,11 @@ export default function Topbar() {
 
   return (
     <header className="flex items-center justify-between gap-3 border-b border-(--color-border) px-4 py-3 sm:px-6">
-      <Link href="/panel" className="font-display text-lg italic font-semibold text-(--color-ink)">
+      <Link
+        href="/panel"
+        className="flex items-center gap-2 font-display text-lg italic font-semibold text-(--color-ink)"
+      >
+        <Logo />
         {t("common.appName")}
       </Link>
 

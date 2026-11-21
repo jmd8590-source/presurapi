@@ -13,7 +13,13 @@ export default function ObrasPage() {
   const { t } = useLocale();
   const { db, listo, crearObra, cambiarEstadoObra } = useAppwriteStore();
   const [abierto, setAbierto] = useState(false);
-  const [form, setForm] = useState({ cliente_id: "", nombre: "", direccion: "", descripcion: "" });
+  const [form, setForm] = useState<{
+    cliente_id: string;
+    nombre: string;
+    direccion: string;
+    descripcion: string;
+    tipo_obra: "nueva" | "reforma";
+  }>({ cliente_id: "", nombre: "", direccion: "", descripcion: "", tipo_obra: "nueva" });
 
   if (!listo) return null;
 
@@ -23,7 +29,7 @@ export default function ObrasPage() {
     e.preventDefault();
     if (!form.nombre.trim() || !form.cliente_id) return;
     crearObra(form);
-    setForm({ cliente_id: "", nombre: "", direccion: "", descripcion: "" });
+    setForm({ cliente_id: "", nombre: "", direccion: "", descripcion: "", tipo_obra: "nueva" });
     setAbierto(false);
   }
 
@@ -86,6 +92,31 @@ export default function ObrasPage() {
                 onChange={(e) => setForm({ ...form, nombre: e.target.value })}
               />
             </Campo>
+            <fieldset className="sm:col-span-2">
+              <legend className="text-sm font-medium text-(--color-ink)">{t("obras.type")}</legend>
+              <div className="mt-1.5 flex gap-4">
+                <label className="flex items-center gap-1.5 text-sm text-(--color-ink)">
+                  <input
+                    type="radio"
+                    name="tipo_obra"
+                    value="nueva"
+                    checked={form.tipo_obra === "nueva"}
+                    onChange={() => setForm({ ...form, tipo_obra: "nueva" })}
+                  />
+                  {t("obras.typeNew")}
+                </label>
+                <label className="flex items-center gap-1.5 text-sm text-(--color-ink)">
+                  <input
+                    type="radio"
+                    name="tipo_obra"
+                    value="reforma"
+                    checked={form.tipo_obra === "reforma"}
+                    onChange={() => setForm({ ...form, tipo_obra: "reforma" })}
+                  />
+                  {t("obras.typeRenovation")}
+                </label>
+              </div>
+            </fieldset>
             <div className="sm:col-span-2">
               <Campo label={t("obras.address")}>
                 <input
@@ -134,6 +165,16 @@ export default function ObrasPage() {
             <div>
               <p className="text-sm font-medium text-(--color-ink)">
                 {obra.nombre}
+                <span
+                  className="ml-2 rounded-[2px] px-1.5 py-0.5 text-[10px] font-medium tracking-wide uppercase"
+                  style={{
+                    background: "var(--color-paper)",
+                    color: "var(--color-ink-muted)",
+                    border: "1px solid var(--color-border-strong)",
+                  }}
+                >
+                  {obra.tipo_obra === "reforma" ? t("obras.typeRenovation") : t("obras.typeNew")}
+                </span>
                 {obra.estado === "archivada" && (
                   <span className="ml-2 text-xs text-(--color-ink-faint)">
                     ({t("obras.archived")})

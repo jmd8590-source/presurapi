@@ -14,6 +14,7 @@ export const TABLA = {
   capitulos: "capitulos",
   partidas: "partidas",
   preciosUsuario: "precios_usuario",
+  materialesPropios: "materiales_propios",
 } as const;
 
 export const SESSION_COOKIE = "presurapi_session";
