@@ -84,6 +84,7 @@ const es = {
       ajustes: "Ajustes",
     },
     logout: "Cerrar sesión",
+    menu: "Menú",
     errorLoad: "No se han podido cargar tus datos. Comprueba tu conexión y recarga la página.",
     errorSave: "No se ha podido guardar ese cambio. Vuelve a intentarlo.",
     dismiss: "Cerrar aviso",

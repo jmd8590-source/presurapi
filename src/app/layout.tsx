@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/lib/theme/ThemeProvider";
 import { defaultLocale } from "@/lib/i18n";
 import SkipLink from "@/components/ui/SkipLink";
 import CookieBanner from "@/components/ui/CookieBanner";
+import ServiceWorkerRegister from "@/components/ui/ServiceWorkerRegister";
 
 // Next.js 16 "Cache Components" prerenders this layout into the static shell, so it
 // never reads cookies()/headers() here (that would force the whole app dynamic).
@@ -36,14 +37,26 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Presurapi",
-  description: "Presupuestos de obra en minutos para albañiles y reformas.",
+  title: {
+    default: "Presurapi — Presupuestos de obra en minutos",
+    template: "%s · Presurapi",
+  },
+  description: "Presupuestos de obra en minutos para albañiles y pequeñas empresas de reforma.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Presurapi",
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f4efe6" },
+    { media: "(prefers-color-scheme: dark)", color: "#16140f" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -72,6 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
             </div>
             <CookieBanner />
+            <ServiceWorkerRegister />
           </ThemeProvider>
         </LocaleProvider>
       </body>

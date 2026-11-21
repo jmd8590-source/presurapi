@@ -32,8 +32,14 @@ export default function CookieBanner() {
     <div
       role="region"
       aria-label={t("cookiesBanner.policyLink")}
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-(--color-border) bg-(--color-surface) px-4 py-4 sm:px-6"
-      style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+      className="fixed inset-x-0 z-50 border-t border-(--color-border) bg-(--color-surface) px-4 py-4 sm:px-6"
+      style={{
+        // Encima del menú inferior del panel cuando existe (BottomNav.tsx
+        // fija --bottom-nav-space al montar), para no taparlo ni que te tape
+        // a ti; en el resto de páginas esa variable vale 0 y se pega abajo.
+        bottom: "var(--bottom-nav-space, 0px)",
+        paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
+      }}
     >
       <div className="mx-auto flex max-w-4xl flex-col gap-3">
         <p className="text-sm text-(--color-ink)">

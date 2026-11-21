@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { getLoggedInUser } from "@/lib/appwrite/server";
 import { SESSION_COOKIE } from "@/lib/appwrite/config";
 import { AppwriteDataProvider } from "@/lib/appwrite/store";
@@ -12,6 +13,12 @@ import ErrorBanner from "@/components/panel/ErrorBanner";
 // cada petición): no tiene sentido como shell estático, así que se excluye
 // de la validación de "instant navigation" de Cache Components.
 export const instant = false;
+
+// Título por defecto para toda /panel/*: las páginas del panel son
+// componentes cliente y no pueden exportar su propio `metadata`, así que
+// como mínimo se distinguen del resto del sitio con "Panel · Presurapi" en
+// vez del título genérico de la portada.
+export const metadata: Metadata = { title: "Panel" };
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const usuario = await getLoggedInUser();

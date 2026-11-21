@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { useAppwriteStore } from "@/lib/appwrite/store";
+import Campo from "@/components/ui/Campo";
 
 const inputClase =
   "rounded-sm border border-(--color-border-strong) bg-(--color-surface) px-3 py-2.5 text-sm text-(--color-ink) outline-none focus-visible:border-(--color-brass)";
@@ -60,41 +61,50 @@ export default function ObrasPage() {
           className="mt-4 flex flex-col gap-3 rounded-sm border border-(--color-border) bg-(--color-surface) p-4"
         >
           <div className="grid gap-3 sm:grid-cols-2">
-            <select
-              required
-              className={inputClase}
-              value={form.cliente_id}
-              onChange={(e) => setForm({ ...form, cliente_id: e.target.value })}
-            >
-              <option value="" disabled>
-                {t("obras.client")}
-              </option>
-              {clientesActivos.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nombre}
+            <Campo label={t("obras.client")}>
+              <select
+                required
+                className={inputClase}
+                value={form.cliente_id}
+                onChange={(e) => setForm({ ...form, cliente_id: e.target.value })}
+              >
+                <option value="" disabled>
+                  {t("obras.client")}
                 </option>
-              ))}
-            </select>
-            <input
-              required
-              placeholder={t("obras.name")}
-              className={inputClase}
-              value={form.nombre}
-              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-            />
-            <input
-              placeholder={t("obras.address")}
-              className={`${inputClase} sm:col-span-2`}
-              value={form.direccion}
-              onChange={(e) => setForm({ ...form, direccion: e.target.value })}
-            />
-            <textarea
-              placeholder={t("obras.description")}
-              rows={2}
-              className={`${inputClase} sm:col-span-2`}
-              value={form.descripcion}
-              onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-            />
+                {clientesActivos.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nombre}
+                  </option>
+                ))}
+              </select>
+            </Campo>
+            <Campo label={t("obras.name")}>
+              <input
+                required
+                className={inputClase}
+                value={form.nombre}
+                onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+              />
+            </Campo>
+            <div className="sm:col-span-2">
+              <Campo label={t("obras.address")}>
+                <input
+                  className={inputClase}
+                  value={form.direccion}
+                  onChange={(e) => setForm({ ...form, direccion: e.target.value })}
+                />
+              </Campo>
+            </div>
+            <div className="sm:col-span-2">
+              <Campo label={t("obras.description")}>
+                <textarea
+                  rows={2}
+                  className={inputClase}
+                  value={form.descripcion}
+                  onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
+                />
+              </Campo>
+            </div>
           </div>
           <div className="flex gap-2">
             <button

@@ -26,6 +26,42 @@ Variables de entorno necesarias: copia `.env.example` a `.env.local` y rellena l
 - `materiales` y `mano_obra` de cada partida se guardan como JSON embebido en la propia fila de `partidas` (columnas `materiales_json`/`mano_obra_json`) en vez de en tablas aparte: son 2-3 líneas por partida, nunca se consultan sueltas, y así se evitan N llamadas adicionales por presupuesto.
 - Sin enlace público de presupuesto (`/p/[token]`): no llegó a construirse en la demo tampoco, así que no es una regresión.
 
+## Logo e identidad
+
+Monogramo "P" geométrico sobre una ficha redondeada en el latón de marca
+(`#a9752e`), diseñado a mano en SVG (`public/logo.svg`), sin ningún
+generador de imágenes — legible desde 16 px (pestaña del navegador) hasta
+512 px (icono de instalación). `public/logo-maskable.svg` es la misma marca
+a sangre completa, para los sistemas que recortan el icono en círculo o
+"squircle". Todos los PNG de favicon/app-icon/manifest se generan desde
+esos dos SVG (ver más abajo); si se cambia el diseño, basta con editar los
+SVG y regenerar.
+
+## PWA (instalable, con soporte offline básico)
+
+- `src/app/manifest.ts` — manifest.webmanifest con nombre, colores e iconos.
+- `src/app/icon.png` / `apple-icon.png` / `favicon.ico` — generados desde `public/logo.svg` (favicon multi-resolución 16/32/48 vía ImageMagick).
+- `public/icon-192.png`, `icon-512.png`, `icon-maskable-{192,512}.png` — iconos del manifest.
+- `public/sw.js` + `src/components/ui/ServiceWorkerRegister.tsx` — service worker mínimo: nunca intercepta llamadas a Appwrite (otro origen), solo cachea estáticos inmutables de Next y, para la navegación, red primero con `/offline` (`src/app/offline/page.tsx`) como último recurso sin conexión.
+
+Para regenerar los PNG tras cambiar el logo:
+
+```bash
+node -e "
+const sharp = require('sharp');
+(async () => {
+  await Promise.all([16,32,48].map(s => sharp('public/logo.svg').resize(s,s).png().toFile('/tmp/fav-'+s+'.png')));
+  await sharp('public/logo.svg').resize(512,512).png().toFile('src/app/icon.png');
+  await sharp('public/logo.svg').resize(180,180).png().toFile('src/app/apple-icon.png');
+  await sharp('public/logo.svg').resize(192,192).png().toFile('public/icon-192.png');
+  await sharp('public/logo.svg').resize(512,512).png().toFile('public/icon-512.png');
+  await sharp('public/logo-maskable.svg').resize(192,192).png().toFile('public/icon-maskable-192.png');
+  await sharp('public/logo-maskable.svg').resize(512,512).png().toFile('public/icon-maskable-512.png');
+})();
+"
+convert /tmp/fav-16.png /tmp/fav-32.png /tmp/fav-48.png src/app/favicon.ico
+```
+
 ## Desarrollo
 
 ```bash
@@ -45,6 +81,6 @@ Los scripts de test (Vitest/Playwright) aún no existen; el CI (`.github/workflo
 
 ## Próximos pasos
 
-1. Accesibilidad: los formularios de clientes/obras usan solo `placeholder` en varios campos, sin `<label>` visible asociado — conviene añadirlos en una pasada dedicada.
-2. Envío del PDF por email (Resend) cuando haya dominio propio verificado.
-3. Ofuscación/minificación reforzada del bundle de producción antes de un lanzamiento público.
+1. Envío del PDF por email (Resend) cuando haya dominio propio verificado.
+2. Enlace público de presupuesto (`/p/[token]`), resuelto en servidor con la API key, sin dar permiso de lectura público sobre todo el documento.
+3. Títulos por página dentro de `/panel/*`: hoy todas comparten "Panel · Presurapi" porque son componentes cliente y no pueden exportar `metadata` por separado; requeriría dividir cada página en un envoltorio de servidor + contenido cliente, como se hizo con `cookies/page.tsx`.

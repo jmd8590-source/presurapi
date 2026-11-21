@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import LegalPage from "@/components/legal/LegalPage";
 
 const PENDIENTE = "[PENDIENTE]";
+
+export const metadata: Metadata = { title: "Aviso legal" };
 
 export default function AvisoLegalPage() {
   return (

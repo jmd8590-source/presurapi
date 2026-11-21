@@ -86,6 +86,7 @@ const en: typeof es = {
       ajustes: "Settings",
     },
     logout: "Sign out",
+    menu: "Menu",
     errorLoad: "We couldn't load your data. Check your connection and reload the page.",
     errorSave: "That change couldn't be saved. Please try again.",
     dismiss: "Dismiss notice",

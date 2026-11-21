@@ -23,6 +23,10 @@
   --color-danger: #a13d29;
   --color-danger-contrast: #fbf8f2;
   --color-focus-ring: #a9752e;
+  /* Alto real del menú inferior cuando está presente (BottomNav.tsx lo fija
+     al montar), para que el banner de cookies no quede tapado por él ni lo
+     tape a él en /panel en móvil. */
+  --bottom-nav-space: 0px;
 
   --font-display: var(--font-fraunces);
   --font-sans: var(--font-plex-sans);

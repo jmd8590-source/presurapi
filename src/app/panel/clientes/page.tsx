@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { useAppwriteStore } from "@/lib/appwrite/store";
+import Campo from "@/components/ui/Campo";
 
 const inputClase =
   "rounded-sm border border-(--color-border-strong) bg-(--color-surface) px-3 py-2.5 text-sm text-(--color-ink) outline-none focus-visible:border-(--color-brass)";
@@ -53,45 +54,55 @@ export default function ClientesPage() {
           className="mt-4 flex flex-col gap-3 rounded-sm border border-(--color-border) bg-(--color-surface) p-4"
         >
           <div className="grid gap-3 sm:grid-cols-2">
-            <input
-              required
-              placeholder={t("clientes.name")}
-              className={inputClase}
-              value={form.nombre}
-              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-            />
-            <input
-              placeholder={t("clientes.taxId")}
-              className={inputClase}
-              value={form.nif}
-              onChange={(e) => setForm({ ...form, nif: e.target.value })}
-            />
-            <input
-              type="email"
-              placeholder={t("clientes.email")}
-              className={inputClase}
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
-            <input
-              placeholder={t("clientes.phone")}
-              className={inputClase}
-              value={form.telefono}
-              onChange={(e) => setForm({ ...form, telefono: e.target.value })}
-            />
-            <input
-              placeholder={t("clientes.address")}
-              className={`${inputClase} sm:col-span-2`}
-              value={form.direccion}
-              onChange={(e) => setForm({ ...form, direccion: e.target.value })}
-            />
-            <textarea
-              placeholder={t("clientes.notes")}
-              rows={2}
-              className={`${inputClase} sm:col-span-2`}
-              value={form.notas}
-              onChange={(e) => setForm({ ...form, notas: e.target.value })}
-            />
+            <Campo label={t("clientes.name")}>
+              <input
+                required
+                className={inputClase}
+                value={form.nombre}
+                onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+              />
+            </Campo>
+            <Campo label={t("clientes.taxId")}>
+              <input
+                className={inputClase}
+                value={form.nif}
+                onChange={(e) => setForm({ ...form, nif: e.target.value })}
+              />
+            </Campo>
+            <Campo label={t("clientes.email")}>
+              <input
+                type="email"
+                className={inputClase}
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+            </Campo>
+            <Campo label={t("clientes.phone")}>
+              <input
+                className={inputClase}
+                value={form.telefono}
+                onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+              />
+            </Campo>
+            <div className="sm:col-span-2">
+              <Campo label={t("clientes.address")}>
+                <input
+                  className={inputClase}
+                  value={form.direccion}
+                  onChange={(e) => setForm({ ...form, direccion: e.target.value })}
+                />
+              </Campo>
+            </div>
+            <div className="sm:col-span-2">
+              <Campo label={t("clientes.notes")}>
+                <textarea
+                  rows={2}
+                  className={inputClase}
+                  value={form.notas}
+                  onChange={(e) => setForm({ ...form, notas: e.target.value })}
+                />
+              </Campo>
+            </div>
           </div>
           <div className="flex gap-2">
             <button

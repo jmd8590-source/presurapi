@@ -5,15 +5,7 @@ import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { useAppwriteStore } from "@/lib/appwrite/store";
 import { PRECIO_HORA_OFICIAL_DEFECTO, PRECIO_HORA_PEON_DEFECTO } from "@/lib/demo/calculo";
 import { borrarCuentaCompleta } from "@/app/acciones/auth";
-
-function Campo({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-sm font-medium text-(--color-ink)">{label}</span>
-      {children}
-    </label>
-  );
-}
+import Campo from "@/components/ui/Campo";
 
 const inputClase =
   "rounded-sm border border-(--color-border-strong) bg-(--color-surface) px-3 py-2.5 text-sm text-(--color-ink) outline-none focus-visible:border-(--color-brass)";
