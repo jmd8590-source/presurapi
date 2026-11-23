@@ -242,6 +242,10 @@ type AppwriteStoreValue = {
     unidad: UnidadMaterial;
     precio: number;
   }) => MaterialPropio;
+  actualizarMaterialPropio: (
+    id: string,
+    cambios: { nombre: string; unidad: UnidadMaterial; precio: number },
+  ) => void;
   eliminarMaterialPropio: (id: string) => void;
 };
 
@@ -955,6 +959,26 @@ export function AppwriteDataProvider({
     [aplicar, tablesDB, userId, permisosPropios],
   );
 
+  const actualizarMaterialPropio = useCallback<AppwriteStoreValue["actualizarMaterialPropio"]>(
+    (id, cambios) =>
+      aplicar(
+        (db) => ({
+          ...db,
+          materiales_propios: db.materiales_propios.map((m) =>
+            m.id === id ? { ...m, ...cambios } : m,
+          ),
+        }),
+        () =>
+          tablesDB.updateRow<Models.DefaultRow>({
+            databaseId: APPWRITE_DATABASE_ID,
+            tableId: TABLA.materialesPropios,
+            rowId: id,
+            data: cambios,
+          }),
+      ),
+    [aplicar, tablesDB],
+  );
+
   const eliminarMaterialPropio = useCallback<AppwriteStoreValue["eliminarMaterialPropio"]>(
     (id) =>
       aplicar(
@@ -997,6 +1021,7 @@ export function AppwriteDataProvider({
       fijarPrecioMaterial,
       quitarPrecioMaterial,
       crearMaterialPropio,
+      actualizarMaterialPropio,
       eliminarMaterialPropio,
     }),
     [
@@ -1023,6 +1048,7 @@ export function AppwriteDataProvider({
       fijarPrecioMaterial,
       quitarPrecioMaterial,
       crearMaterialPropio,
+      actualizarMaterialPropio,
       eliminarMaterialPropio,
     ],
   );
